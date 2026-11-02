@@ -1,0 +1,134 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>62706404 INDEX L3 ANTI-SHARE</title><style>body{margin:0;font-family:system-ui;background:#020617;color:#fff;padding:10px;text-align:center} .card{background:#fff;color:#111;padding:16px;border-radius:16px;max-width:520px;margin:auto;position:relative;overflow:hidden} input,select{padding:12px;width:92%;border:2px solid #ca8a04;border-radius:10px;margin:6px} button{padding:13px;width:95%;border:none;border-radius:10px;font-weight:bold;margin:6px;cursor:pointer} button.go{background:#ca8a04;color:#fff} button.blue{background:#2563eb;color:#fff} button.green{background:#16a34a;color:#fff} button.dark{background:#111;color:#fff} button.yellow{background:#ffcc00;color:#000;font-size:15px} button.red{background:#e30613;color:#fff} .small{font-size:10px;color:#64748b} .role{border:2px solid #111;border-radius:12px;padding:10px;margin:8px 0;text-align:left} .prog{height:14px;background:#e2e8f0;border-radius:7px;overflow:hidden} .bar{height:100%;transition:.3s} .wm{position:absolute;top:45%;left:10%;opacity:0.05;font-size:32px;transform:rotate(-25deg);pointer-events:none;white-space:nowrap;font-weight:bold}</style></head><body>
+<div class="card">
+<div class="wm" id="wm"></div>
+<h2>🎓 ISOMERO<br><span style="font-size:10px;background:gold;padding:4px 8px;border-radius:6px">L3 ANTI-SHARE + LUMICASH BTN</span></h2>
+<p class="small">ID: <b id="dId" style="background:#000;color:gold;padding:3px 8px;border-radius:6px"></b><br>REP: <b id="repRef"></b> | LEAD: <b id="leadRef"></b> | <span id="secStatus"></span></p>
+<p class="small"><span id="roleLabel"></span>: <b id="kidCount">0</b>/20 <div class="prog"><div id="bar" class="bar" style="width:0%"></div></div></p>
+<select id="roleSel" onchange="onRole()"><option value="Kid">👶 Kid – 15K / 30j</option><option value="Repetitor">👨‍🏫 Repetitor – AUTO 5K/mois</option><option value="Leader">🏆 Leader – AUTO 5K</option><option value="Admin">🔐 Admin 62706404</option></select>
+<div id="adminBox" style="display:none"><input id="adminPass" type="password" placeholder="62706404"><button class="dark" onclick="adminLogin()">Login Admin</button><button class="blue" onclick="adminAdd20()">⚡ +20 Kids Test</button></div>
+<div id="payBox">
+<div class="role"><b>Kid:</b> Codes parrain<br><input id="repCode" placeholder="REP-D..."><input id="leadCode" placeholder="LEAD-D..."></div>
+
+<div class="role" style="border-color:#ca8a04">🌱 PRIMARY – 15,000 FBU / 30j
+<br><button class="yellow" onclick="payNow('PRIMARY')">💛 LUMICASH 62706404 – 15K<br><small>*616*2*62706404*15000# – Click pour appeler</small></button>
+<button class="red" onclick="payEco('PRIMARY')">❤️ ECOCASH – 15K</button>
+<input id="tP" placeholder="Colle ID Trans ici après paiement"><button class="green" onclick="ACT('PRIMARY')">🔓 VALIDER + DÉBLOQUER</button></div>
+
+<div class="role">📚 SECONDARY – 15K
+<br><button class="yellow" onclick="payNow('SECONDARY')">💛 LUMICASH 62706404</button><button class="red" onclick="payEco('SECONDARY')">❤️ ECOCASH</button>
+<input id="tS" placeholder="ID Trans"><button class="blue" onclick="ACT('SECONDARY')">🔓 VALIDER</button></div>
+
+<div class="role">💰 ECONOMICS – 15K
+<br><button class="yellow" onclick="payNow('ECO')">💛 LUMICASH 62706404</button><button class="red" onclick="payEco('ECO')">❤️ ECOCASH</button>
+<input id="tE" placeholder="ID Trans"><button class="go" onclick="ACT('ECO')">🔓 VALIDER</button></div>
+
+<div class="role" style="border-color:#000;background:#f8fafc">💳 DIASPORA – $3<br><button class="dark" onclick="payCard()">Payer par Carte</button></div>
+<input id="kName" placeholder="Ton Nom complet (obligatoire)">
+</div>
+<button class="blue" onclick="goApp()">📚 OUVRIR app.html – L3 Check</button>
+<button class="dark" onclick="clearAll()" style="width:auto;padding:8px 12px;font-size:10px">Effacer</button>
+<p class="small">L3: Appareil bloqué. Xender/Acode = auto-verrouillage. Watermark ID visible.</p>
+</div>
+<script>
+const NUM="62706404",BASE=15000,BONUS=5000,MIN_KIDS=20;
+// === L3 ANTI-SHARE CORE ===
+const getId=()=>{
+ let s=navigator.userAgent+screen.width+screen.height+navigator.language+ (navigator.hardwareConcurrency||4);
+ let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}
+ return 'D'+Math.abs(h).toString().slice(0,6);
+};
+let dId=getId();
+document.getElementById('dId').innerText=dId;
+document.getElementById('wm').innerText=dId+" – 62706404";
+document.getElementById('repRef').innerText='REP-'+dId;
+document.getElementById('leadRef').innerText='LEAD-'+dId;
+
+// L3: First time this device ever opened? Store creation signature
+if(!localStorage.getItem('DEVICE_SIG_'+dId)){
+ localStorage.setItem('DEVICE_SIG_'+dId, JSON.stringify({dId:dId,created:Date.now(),ua:navigator.userAgent.slice(0,40)}));
+}
+function securityCheck(){
+ // Detect clone: if we have LOCK with different dId than current device
+ for(let i=0;i<localStorage.length;i++){
+   let k=localStorage.key(i);
+   if(k && k.startsWith('LOCK_') && k.includes('_'+NUM)){
+     try{
+       let o=JSON.parse(localStorage.getItem(k));
+       if(o && o.dId && o.dId !== dId){
+         // Clone detected – student copied from other phone
+         document.getElementById('secStatus').innerHTML="<span style='color:red;font-weight:bold'>🚨 CLONE DÉTECTÉ – ID "+o.dId+" ≠ "+dId+"</span>";
+         // Auto-wipe cloned locks after 5 sec
+         setTimeout(()=>{ localStorage.removeItem(k); alert("🔒 Sécurité L3: Contenu copié depuis autre appareil détecté.\nCe téléphone doit payer son propre accès.\nID source: "+o.dId); location.reload(); }, 2000);
+         return false;
+       }
+     }catch(e){}
+   }
+ }
+ // Check expiry
+ ['PRIMARY','SECONDARY','ECO'].forEach(cat=>{
+   let lock=localStorage.getItem('LOCK_'+cat+'_'+dId);
+   if(lock){
+     try{
+       let o=JSON.parse(lock);
+       if(Date.now() > o.exp){
+         localStorage.removeItem('LOCK_'+cat+'_'+dId);
+         localStorage.removeItem('LOCK_'+cat+'_'+NUM);
+         console.log(cat+" expiré");
+       }
+     }catch(e){}
+   }
+ });
+ document.getElementById('secStatus').innerHTML="<span style='color:green'>✅ Appareil sécurisé L3</span>";
+ return true;
+}
+
+// === LUMICASH BUTTON 62706404 ===
+function payNow(cat){
+ const ussd=`*616*2*${NUM}*${BASE}#`;
+ localStorage.setItem('PENDING_'+dId,cat);
+ try{ navigator.clipboard.writeText(ussd); }catch(e){}
+ window.location.href="tel:"+encodeURIComponent(ussd);
+ setTimeout(()=>{ alert(`💛 LUMICASH 62706404\n${ussd}\n\n1. Paye 15,000 FBU\n2. Tu reçois SMS avec ID Trans\n3. Colle ID en dessous\n\nCode copié!`); document.getElementById(cat=='PRIMARY'?'tP':cat=='SECONDARY'?'tS':'tE').focus(); },400);
+}
+function payEco(cat){
+ const ussd=`*612*2*${NUM}*${BASE}#`;
+ window.location.href="tel:"+encodeURIComponent(ussd);
+}
+function payCard(){ window.open("https://flutterwave.com/pay/62706404academy","_blank"); }
+function goApp(){
+ if(!securityCheck()) return;
+ location.href='app.html';
+}
+function clearAll(){ if(!confirm('Effacer tout L3?')) return; localStorage.clear(); location.reload(); }
+
+function getKidCount(t){return parseInt(localStorage.getItem(t+'_COUNT_'+dId)||'0');}
+function updateUI(){let r=document.getElementById('roleSel').value;let cur=r=='Repetitor'?getKidCount('REP'):r=='Leader'?getKidCount('LEAD'):0;let need=r=='Repetitor'?MIN_KIDS:0;document.getElementById('roleLabel').innerText=r;document.getElementById('kidCount').innerText=cur;let bar=document.getElementById('bar');bar.style.width=need?Math.min(cur/need*100,100)+'%':'100%';bar.style.background=(need==0||cur>=need)?'#16a34a':'#eab308';}
+function onRole(){let r=document.getElementById('roleSel').value;document.getElementById('adminBox').style.display=r=='Admin'?'block':'none';document.getElementById('payBox').style.display=r=='Admin'?'none':'block';localStorage.setItem('ROLE_'+dId,r);updateUI();}
+function adminLogin(){if(document.getElementById('adminPass').value!==NUM)return alert('Wrong');localStorage.setItem('ROLE_'+dId,'Admin');localStorage.setItem('LOCK_ADMIN_'+NUM,JSON.stringify({dId:dId,name:'Admin',key:'ADMIN-'+dId,role:'Admin',cat:'ADMIN',exp:Date.now()+365*86400000}));localStorage.setItem('LOCK_ADMIN_'+dId,JSON.stringify({dId:dId}));alert('Admin L3 OK');}
+function adminAdd20(){['REP','LEAD'].forEach(tp=>{localStorage.setItem(tp+'_COUNT_'+dId,MIN_KIDS.toString());localStorage.setItem(tp+'_EARN_'+dId,(MIN_KIDS*BONUS).toString());localStorage.setItem(tp+'_PAID_'+dId,(MIN_KIDS*BONUS).toString());});updateUI();alert('AUTO 20 L3 added');}
+function autoPay(type,targetDId,amount,kidName){
+ let kE=type+'_EARN_'+targetDId,kP=type+'_PAID_'+targetDId,kL=type+'_LOG_'+targetDId;
+ let earn=parseInt(localStorage.getItem(kE)||'0')+amount;localStorage.setItem(kE,earn.toString());
+ let paid=parseInt(localStorage.getItem(kP)||'0')+amount;localStorage.setItem(kP,paid.toString());
+ let log=JSON.parse(localStorage.getItem(kL)||'[]');let tr='AUTO-'+Date.now().toString().slice(-6);
+ log.push({date:new Date().toISOString(),kid:kidName,kidDId:dId,amount:amount,type:type,status:'AUTO-PAID',transId:tr,srcDId:dId});
+ localStorage.setItem(kL,JSON.stringify(log));return {transId:tr};
+}
+function addKidTo(codeType,targetDId,name,cat){let cnt=parseInt(localStorage.getItem(codeType+'_COUNT_'+targetDId)||'0')+1;localStorage.setItem(codeType+'_COUNT_'+targetDId,cnt.toString());let pay=autoPay(codeType,targetDId,BONUS,name);let list=JSON.parse(localStorage.getItem(codeType+'_LIST_'+targetDId)||'[]');list.push({name:name,dId:dId,cat:cat,date:Date.now(),paid:BONUS,transId:pay.transId,status:'AUTO-PAID'});localStorage.setItem(codeType+'_LIST_'+targetDId,JSON.stringify(list));return pay;}
+function ACT(cat){
+ if(!securityCheck()) return;
+ let role=document.getElementById('roleSel').value;let name=document.getElementById('kName').value.trim();if(name.length<2)return alert('Nom obligatoire – watermark L3');let t=document.getElementById(cat=='PRIMARY'?'tP':cat=='SECONDARY'?'tS':'tE').value.trim();if(role!='Admin'&&t.length<4)return alert('ID Trans – après paiement Lumicash 62706404');
+ let repCode=document.getElementById('repCode').value.trim();let leadCode=document.getElementById('leadCode').value.trim();
+ if(role=='Repetitor'){let c=getKidCount('REP');if(c<MIN_KIDS)return alert(`🚫 Besoin ${MIN_KIDS} – Tu as ${c}/${MIN_KIDS} – Partage REP-${dId}`);}
+ let msg=[];if(role=='Kid'){if(repCode.startsWith('REP-')){let td=repCode.replace('REP-','');let p=addKidTo('REP',td,name,cat);msg.push(`REP AUTO 5K ${p.transId}`);}if(leadCode.startsWith('LEAD-')){let td=leadCode.replace('LEAD-','');let p=addKidTo('LEAD',td,name,cat);msg.push(`LEAD AUTO 5K ${p.transId}`);}}
+ let k=role+'-'+cat+'-'+name.slice(0,3).toUpperCase()+'-'+dId+'-'+Date.now().toString(36);
+ let o={dId:dId,name:name,key:k,tId:t,cat:cat,role:role,repCode:repCode,leadCode:leadCode,paid:BASE,num:NUM,exp:Date.now()+30*86400000,sig:getId()+'_'+Date.now()};
+ // L3: Save by BOTH NUM and dId – makes clone detection possible
+ localStorage.setItem('LOCK_'+cat+'_'+NUM,JSON.stringify(o));
+ localStorage.setItem('LOCK_'+cat+'_'+dId,JSON.stringify(o));
+ localStorage.setItem('ROLE_'+dId,role);
+ localStorage.setItem('OWNER_'+cat+'_'+dId,name);
+ alert(`✅ L3 ${role} ${cat} 15K OK – Appareil ${dId}\n${msg.join('\n')||'Solo'}\nValide 30 jours – Non transférable`);updateUI();
+}
+onRole();updateUI();securityCheck();
+</script></body></html>

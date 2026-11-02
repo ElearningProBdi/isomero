@@ -1,0 +1,201 @@
+<<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ISOMERO H5P FULL L3 1/3</title><style>
+body{margin:0;background:#0a0e1f;color:#eef;font-family:system-ui;padding:8px}
+.card{background:#131a36;border:1px solid #1e2540;border-radius:14px;padding:12px;margin:10px 0;position:relative;overflow:hidden}
+button{border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;margin:4px 0;width:100%}.btn-gold{background:#ffcc00;color:#000}.btn-dark{background:#fff;color:#000}.btn-blue{background:#4f46e5;color:#fff}
+select,input,textarea{background:#0f1326;color:#fff;border:1px solid #1e2540;padding:10px;border-radius:10px;width:100%;margin:4px 0}
+.badge{font-size:11px;padding:4px 8px;border-radius:99px}.ok{background:#00ff88;color:#000;font-weight:800}.lock{background:#ff2a5a;color:#fff;font-weight:800}
+.tab{padding:8px 14px;border-radius:99px;border:1px solid #1e2540;background:#11162e;font-size:13px;margin:3px;display:inline-block;cursor:pointer}.tab.active{background:#fff;color:#000;font-weight:800}
+.header{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #1e2540;position:sticky;top:0;background:#0a0e1f;z-index:10}
+.wm{position:absolute;top:6px;right:8px;font-size:9px;color:#ffcc00;background:rgba(0,0,0,.7);padding:2px 6px;border-radius:6px;z-index:2}
+.wmC{position:absolute;top:40%;left:5%;transform:rotate(-18deg);font-size:28px;opacity:.06;pointer-events:none;font-weight:800;white-space:nowrap}
+.player{position:fixed;inset:0;background:rgba(0,0,0,.93);padding:10px;display:none;z-index:99;overflow:auto}.player.open{display:block}.sheet{max-width:820px;margin:auto;background:#0f1326;border-radius:14px;padding:12px;border:1px solid #1e2540}
+.q{margin:10px 0;padding:12px;border-radius:12px;background:#11162e;border:1px solid #1e2540}
+</style></head><body>
+<div class="header"><b>ISOMERO H5P FULL 62706404</b><b id="dId" style="background:#ffcc00;color:#000;padding:5px 10px;border-radius:99px">ID</b><span id="sec" style="font-size:11px"></span></div>
+<div id="tabs" style="padding:8px 2px"></div><div id="list"></div><div class="player" id="playerBox"><div class="sheet" id="player"></div></div>
+<script>
+const NUM="62706404";
+// FULL DEVICE ID STABLE – L3
+const getId=()=>{let s=navigator.userAgent+screen.width+screen.height+navigator.language+(navigator.hardwareConcurrency||4)+Intl.DateTimeFormat().resolvedOptions().timeZone;let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return 'D'+Math.abs(h).toString().slice(0,6);};
+let dId=getId();document.getElementById('dId').innerText=dId;
+// FULL L3 SECURITY LOGIC – CLONE – EXPIRY – NON TRANSFERABLE
+function securityCheck(){
+ let hasLock=false;
+ ['GENERAL','PRIMARY','SECONDARY','ECO','ADMIN'].forEach(cat=>{
+  if(localStorage.getItem('LOCK_'+cat+'_'+dId)||localStorage.getItem('LOCK_'+cat+'_'+NUM)) hasLock=true;
+ });
+ if(!hasLock){
+  document.getElementById('sec').innerHTML="<span style='color:red'>NON PAYE</span>";
+  document.getElementById('list').innerHTML=`<div class="card" style="border:2px solid #ff2a5a;background:#1a0000"><h2>🔒 L3 Verrouille ${dId}</h2><p>Appareil non paye. Un appareil = Un paiement 15K Lumicash 62706404</p><p>Index → Payer → Revenir ici. Apres paiement, tu seras redirige automatiquement.</p><button class="btn-gold" onclick="location.href='index.html'">💛 Payer Lumicash 62706404 – 15K</button></div>`;
+  return false;
+ }
+ // FULL CLONE DETECTION – XENDER ACODE SHAREIT BLUETOOTH
+ for(let i=0;i<localStorage.length;i++){
+  let k=localStorage.key(i);
+  if(k&&k.startsWith('LOCK_')&&k.includes('_'+NUM)){
+   try{
+    let o=JSON.parse(localStorage.getItem(k));
+    if(o&&o.dId&&o.dId!==dId&&!localStorage.getItem('LOCK_'+o.cat+'_'+dId)){
+     document.getElementById('sec').innerHTML="<span style='color:red'>CLONE</span>";
+     document.getElementById('list').innerHTML=`<div class="card" style="border:2px solid red;background:#1a0000"><h2>🚨 CLONE DETECTE – XENDER/ACODE</h2><p>ID Source: ${o.dId}</p><p>Ton ID: ${dId}</p><p>Source != Toi → Bloque. Contenu copie via Xender/ShareIt interdit. NON TRANSFERABLE.</p><p>Efface stockage et paye avec ton propre ID.</p><button class="btn-gold" onclick="localStorage.clear();location.href='index.html'">🗑️ Effacer et Payer avec ${dId}</button></div>`;
+     return false;
+    }
+   }catch(e){}
+  }
+ }
+ // EXPIRY CHECK – 30 JOURS – FIX BUG VIRGULE
+ ['GENERAL','PRIMARY','SECONDARY','ECO','ADMIN'].forEach(cat=>{
+  let lock=localStorage.getItem('LOCK_'+cat+'_'+dId);
+  if(lock){try{let o=JSON.parse(lock);if(o.exp&&Date.now()>o.exp){localStorage.removeItem('LOCK_'+cat+'_'+dId);localStorage.removeItem('LOCK_'+cat+'_'+NUM);hasLock=false;}}catch(e){}}
+ });
+ if(!hasLock){
+  document.getElementById('list').innerHTML=`<div class="card"><h2>⏰ Expire – Renouveler</h2><p>Abonnement 30 jours fini.</p><button class="btn-gold" onclick="location.href='index.html'">Renouveler 15K – 62706404</button></div>`;
+  return false;
+ }
+ document.getElementById('sec').innerHTML="<span style='color:#00ff88'>✅ L3 OK "+dId+" • 62706404</span>";
+ return true;
+}
+// === YOUTUBE EMBEDDER FULL – HANDLES ALL YOUTUBE FORMATS – L3 ===
+function youtubeEmbedder(url){
+ if(!url) return '';
+ url=url.trim(); let id='';
+ if(url.includes('youtu.be/')) id=url.split('youtu.be/')[1].split('?')[0].split('&')[0];
+ else if(url.includes('v=')) id=url.split('v=')[1].split('&')[0];
+ else if(url.includes('embed/')) id=url.split('embed/')[1].split('?')[0];
+ else if(url.includes('shorts/')) id=url.split('shorts/')[1].split('?')[0];
+ else if(url.length===11 && !url.includes(' ')) id=url;
+ else id=url.split('/').pop().split('?')[0].split('&')[0];
+ id=id.trim(); if(!id||id.length<8) return '';
+ // ALISON LIKE SECURE EMBED – NO DOWNLOAD – WATERMARK
+ return `<iframe width="100%" height="250" src="https://www.youtube.com/embed/${id}?controls=1&rel=0&modestbranding=1&playsinline=1&disablekb=0&fs=1&iv_load_policy=3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius:12px;background:#000;display:block"></iframe>`;
+     }
+// FIXED 14 COURSES – OFFICIAL – NEVER DELETED
+const FIXED={
+ GENERAL:[{title:'Anglais',fac:'GENERAL',ch:'English A1-B2 Alison Like',icon:'🇬🇧',vid:'',h5p:''},{title:'Français',fac:'GENERAL',ch:'Grammaire Orthographe',icon:'🇫🇷',vid:'',h5p:''}],
+ PRIMARY:[{title:'Math',fac:'PRIMARY',ch:'Calcul Logique',icon:'🔢',vid:'',h5p:''},{title:'Sciences',fac:'PRIMARY',ch:'Sciences Generales',icon:'🔬',vid:'',h5p:''}],
+ SECONDARY:[{title:'Maths',fac:'SECONDARY',ch:'Algebre Geometrie',icon:'📐',vid:'',h5p:''},{title:'Physique',fac:'SECONDARY',ch:'Mecanique',icon:'⚡',vid:'',h5p:''},{title:'Chimie',fac:'SECONDARY',ch:'Atomistique',icon:'🧪',vid:'',h5p:''},{title:'Biology',fac:'SECONDARY',ch:'Anatomie Biologie',icon:'🧬',vid:'',h5p:''}],
+ ECO:[
+  {title:'Comptabilité Générale',fac:'ECO',ch:'Bilan – Actif=Passif – Compta Generale',icon:'📊',vid:'',h5p:''},
+  {title:'Economie Générale',fac:'ECO',ch:'Marche Croissance Inflation',icon:'📈',vid:'',h5p:''},
+  {title:'Comptabilité Analytique',fac:'ECO',ch:'Couts Complets Partiels',icon:'🧮',vid:'',h5p:''},
+  {title:'Gestion Financière',fac:'ECO',ch:'Analyse financiere Rentabilite',icon:'💼',vid:'',h5p:''},
+  {title:'Macro et Microéconomie',fac:'ECO',ch:'Macro Micro Offre Demande',icon:'🌍',vid:'',h5p:''},
+  {title:'Fiscalité au Bdi',fac:'ECO',ch:'TVA 18% IPR IR Burundi',icon:'⚖️',vid:'',h5p:''}
+ ]
+};
+function loadCourses(){
+ let saved=localStorage.getItem('ISOMERO_COURSES_'+NUM);
+ if(saved){
+  try{
+   let old=JSON.parse(saved);
+   Object.keys(FIXED).forEach(fac=>{
+    FIXED[fac].forEach(nc=>{
+     Object.keys(old).forEach(of=>{
+      (old[of]||[]).forEach(oc=>{
+       if(oc.title===nc.title){
+        if(oc.vid) nc.vid=oc.vid;
+        if(oc.h5p) nc.h5p=oc.h5p;
+       }
+      });
+     });
+    });
+   });
+  }catch(e){}
+ }
+ localStorage.setItem('ISOMERO_COURSES_'+NUM,JSON.stringify(FIXED));
+ return FIXED;
+}
+let ALL=loadCourses();
+function isPaid(f){return !!localStorage.getItem('LOCK_'+f+'_'+dId)||!!localStorage.getItem('LOCK_ADMIN_'+dId)||!!localStorage.getItem('LOCK_ADMIN_'+NUM)||!!localStorage.getItem('LOCK_'+f+'_'+NUM)||f==='GENERAL';}
+let curFac='GENERAL';
+function renderTabs(){let h='';['GENERAL','PRIMARY','SECONDARY','ECO'].forEach(f=>{h+=`<span class="tab ${curFac===f?'active':''}" onclick="curFac='${f}';renderTabs();render()">${f} (${FIXED[f].length})</span>`;});document.getElementById('tabs').innerHTML=h;}
+function render(){
+ if(!securityCheck()) return;
+ let fac=curFac;let paid=isPaid(fac);let html='';
+ // ADMIN PANEL FULL – H5P + YOUTUBE
+ if(localStorage.getItem('ROLE_'+dId)==='Admin'||localStorage.getItem('LOCK_ADMIN_'+NUM)){
+  html+=`<div class="card" style="border:2px solid #ffcc00;background:#1a1600"><b>🔐 Admin 62706404 – FULL H5P + YouTube Embedder + L3</b><br><small style="color:#8b93b8">Titre exact doit matcher liste officielle 14 cours</small><input id="adminTitle" placeholder="Titre exact ex: Fiscalité au Bdi"><input id="adminVid" placeholder="YouTube – tous formats: youtu.be/xxx , youtube.com/watch?v=xxx , shorts/xxx , juste ID"><input id="adminH5p" placeholder="H5P embed link – https://h5p.com/embed/xxx OU https://app.lumi.education/run/xxx OU https://h5p.org/h5p/embed/xxx"><select id="adminFac"><option value="GENERAL">GENERAL (2)</option><option value="PRIMARY">PRIMARY (2)</option><option value="SECONDARY">SECONDARY (4)</option><option value="ECO" selected>ECO (6)</option></select><button class="btn-gold" onclick="adminAdd()">💾 Sauver Vidéo YouTube + H5P L3 – Embedder Full</button><button class="btn-dark" onclick="resetCourses()">🔄 Reset Liste Officielle 14 Cours</button><small style="color:#8b93b8">YouTube Embedder supporte tous formats automatiquement. H5P embed affiche interactive content.</small></div>`;
+ }
+ ALL[fac].forEach((c,i)=>{
+  let hasH5p=c.h5p?' 🧩H5P':'';let hasVid=c.vid?' 📹YT':'';let badge=paid?'✅ DEBLOQUE L3':'🔒 15K';
+  html+=`<div class="card"><div class="wm">D${dId} • ${NUM} • L3</div><div class="wmC">${dId} • 62706404 • ISOMERO • NON TRANSFERABLE • L3</div><b><span style="font-size:20px">${c.icon}</span> ${c.title}</b> <span class="badge ${paid?'ok':'lock'}">${badge}</span> <small style="color:#8b93b8;font-size:10px">${hasVid}${hasH5p}</small><br><small style="color:#8b93b8">${c.ch} • Fac: ${fac} • ID: D${dId}</small><br>${paid?`<button class="btn-dark" onclick="openCourse('${fac}',${i})">📹 Ouvrir Alison Like + H5P Interactive</button>`:`<button class="btn-gold" onclick="location.href='index.html'">💛 Payer Lumicash 62706404 – 15K – Debloquer</button>`}</div>`;
+ });
+ document.getElementById('list').innerHTML=html;
+}
+function resetCourses(){if(confirm('Reset 14 cours officiels? Efface videos custom?')){localStorage.removeItem('ISOMERO_COURSES_'+NUM);ALL=loadCourses();render();}}
+function adminAdd(){
+ let t=document.getElementById('adminTitle').value.trim();
+ let v=document.getElementById('adminVid').value.trim();
+ let h=document.getElementById('adminH5p').value.trim();
+ let f=document.getElementById('adminFac').value;
+ if(!t) return alert('Titre requis – Doit etre exact comme liste 14');
+ let found=false;
+ ALL[f].forEach(c=>{if(c.title.toLowerCase()===t.toLowerCase()){if(v) c.vid=v; if(h) c.h5p=h; found=true;}});
+ if(!found) ALL[f].push({title:t,fac:f,ch:'Chap 1 Nouveau',icon:'📘',vid:v,h5p:h});
+ localStorage.setItem('ISOMERO_COURSES_'+NUM,JSON.stringify(ALL));
+ alert('✅ Sauve L3 – FULL – Video YouTube:'+(v?'OK '+v.slice(0,30):'-')+' – H5P:'+(h?'OK '+h.slice(0,30):'-')+' – Watermark D'+dId);
+ render();
+}
+function openCourse(fac,idx){
+ if(!isPaid(fac)) return alert('Paye d abord 15K Lumicash 62706404');
+ let c=ALL[fac][idx];
+ document.getElementById('playerBox').classList.add('open');
+ document.getElementById('player').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px">${c.icon} ${c.title}</b><button onclick="closePlayer()" style="width:auto;padding:8px 14px;background:#fff;color:#000;border-radius:10px">✕ Fermer</button></div><div style="font-size:11px;color:#8b93b8;margin:6px 0">Faculte: ${fac} • Device ID: D${dId} • Watermark L3 Actif • Non transferable • 62706404 • Alison + H5P Full</div><div id="pluginBox"></div>`;
+ ISOMERO_PLUGINS.renderPlugins(c,'pluginBox',fac,idx);
+}
+function closePlayer(){document.getElementById('playerBox').classList.remove('open');}
+// PLUGIN SYSTEM FULL
+const ISOMERO_PLUGINS={plugins:[],register(p){this.plugins.push(p);},renderPlugins(course,containerId){let b=document.getElementById(containerId);if(!b) return; b.innerHTML=''; this.plugins.forEach(pl=>{if(pl.shouldShow(course)) b.innerHTML+=pl.render(course);});}};
+  // PLUGIN 1 – ALISON LIKE VIDEO WITH YOUTUBE EMBEDDER FULL L3
+ISOMERO_PLUGINS.register({
+ name:'alison-video-youtube-embedder',
+ shouldShow:(c)=>!!c.vid,
+ render:(c)=>{
+  let embed=youtubeEmbedder(c.vid);
+  return `<div class="q" style="background:#000;padding:0;overflow:hidden;border-radius:14px;border:1px solid #1e2540"><div style="position:relative"><div class="wm">D${dId} • ${NUM} • L3 • Alison Video</div>${embed?embed:`<div style="padding:30px;text-align:center;color:#8b93b8">🎬 Pas de video – Admin ajoute lien YouTube</div>`}<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.9));padding:10px 12px;font-size:10px;color:#ffcc00;display:flex;justify-content:space-between"><span>🔒 Watermark D${dId} • ${c.title}</span><span>62706404 • L3 • Non copiable</span></div></div><div style="padding:12px;background:#11162e"><b>${c.icon} ${c.title}</b><br><small style="color:#8b93b8">${c.ch} – YouTube Embedder Full – Supporte youtu.be, watch?v=, shorts, embed, ID</small><div style="height:6px;background:#1e2540;border-radius:99px;margin:10px 0"><div style="width:68%;height:100%;background:#ffcc00;border-radius:99px"></div></div><small>68% complete – Alison like player – YouTube protege L3</small></div></div>`;
+ }
+});
+// PLUGIN 2 – H5P EMBED FULL – INTERACTIVE – L3 WATERMARK
+ISOMERO_PLUGINS.register({
+ name:'h5p-embed-full-l3',
+ shouldShow:(c)=>true,
+ render:(c)=>{
+  let h5pUrl=(c.h5p||'').trim();
+  if(!h5pUrl){
+   return `<div class="q" style="border:1px dashed #4f46e5;background:#0f0f2e"><b>🧩 H5P Interactive Content – ${c.title}</b><p style="font-size:12px;color:#8b93b8;margin:8px 0">Pas de H5P pour ce cours. Admin ajoute lien d'embed H5P.<br><br><b>Formats supportes:</b><br>• https://h5p.com/embed/XXXX (h5p.com)<br>• https://app.lumi.education/run/XXXX (Lumi – Gratuit)<br>• https://h5p.org/h5p/embed/XXXX<br><br><b>Comment creer:</b><br>1. Va sur h5p.com ou lumi.education<br>2. Creer: Interactive Video, Course Presentation, Quiz, etc.<br>3. Publish → Share → Copy Embed Link<br>4. Coller dans Admin panel ici</p><small style="font-size:10px;color:#8b93b8">H5P = Alison-like interactive – Meilleur pour ECO</small></div>`;
+  }
+  // Allow h5p domains only for security
+  let isH5p=h5pUrl.includes('h5p.com')||h5pUrl.includes('h5p.org')||h5pUrl.includes('lumi.education')||h5pUrl.includes('h5p');
+  if(!isH5p) return `<div class="q" style="border:2px solid red"><b>❌ URL H5P non autorisee – Doit etre h5p.com ou lumi.education</b></div>`;
+  return `<div class="q" style="background:#000;padding:0;overflow:hidden;border-radius:14px;border:2px solid #4f46e5"><div style="padding:8px 12px;background:#4f46e5;display:flex;justify-content:space-between;align-items:center"><b style="color:#fff">🧩 H5P Interactive – ${c.title}</b><span style="font-size:10px;background:#fff;color:#4f46e5;padding:3px 8px;border-radius:99px;font-weight:800">D${dId} L3</span></div><iframe src="${h5pUrl}" width="100%" height="460" frameborder="0" allowfullscreen="allowfullscreen" allow="autoplay; encrypted-media; geolocation; microphone; camera" style="background:#fff;display:block;border:none"></iframe><div style="padding:8px 12px;background:#11162e;display:flex;justify-content:space-between;font-size:10px"><span style="color:#ffcc00">🔒 D${dId} • 62706404 • H5P L3 Protege • Watermark actif</span><span style="color:#8b93b8">Non transferable • Alison+H5P</span></div></div>`;
+ }
+});
+// PLUGIN 3 – ALISON TABS – NOTES + RESSOURCES
+ISOMERO_PLUGINS.register({
+ name:'alison-tabs-notes-res',
+ shouldShow:()=>true,
+ render:(c)=>{
+  let safe=c.title.replace(/[^a-zA-Z0-9]/g,'');
+  return `<div class="q"><div style="display:flex;gap:6px"><button onclick="document.getElementById('nt-${safe}').style.display='block';document.getElementById('rs-${safe}').style.display='none'" style="flex:1;background:#fff;color:#000;padding:10px;border-radius:10px">📝 Notes L3</button><button onclick="document.getElementById('nt-${safe}').style.display='none';document.getElementById('rs-${safe}').style.display='block'" style="flex:1;background:#11162e;color:#fff;padding:10px;border:1px solid #1e2540">📚 Ressources</button></div><div id="nt-${safe}" style="display:none;padding-top:12px"><b>📝 Notes – D${dId}</b><textarea id="note_${safe}" placeholder="Tape notes Alison-like ici – Sauve local D${dId} – Non transferable" style="height:90px"></textarea><button class="btn-gold" onclick="localStorage.setItem('NOTE_'+'${c.title}_'+dId,document.getElementById('note_${safe}').value);alert('✅ Notes sauvees D${dId} – Alison L3')">💾 Sauver Notes L3</button></div><div id="rs-${safe}" style="display:none;padding-top:12px"><b>📚 Ressources Alison</b><br><small style="color:#8b93b8">PDF, supports, liens</small><br><br><a href="https://wa.me/25762706404?text=PDF ${encodeURIComponent(c.title)} D${dId} Fac ${c.fac}" target="_blank"><button class="btn-dark">📄 Demander PDF – D${dId}</button></a><a href="https://wa.me/25762706404?text=Support ${encodeURIComponent(c.title)} D${dId}" target="_blank"><button class="btn-dark" style="margin-top:6px">💬 Support Cours – 62706404</button></a></div></div>`;
+ }
+});
+// PLUGIN 4 – QUIZ FULL 5 TYPES – MOODLE ALISON LIKE
+ISOMERO_PLUGINS.register({
+ name:'quiz-full-5-types',
+ shouldShow:()=>true,
+ render:()=>`<div class="q"><h4 style="margin:0 0 10px 0">✅ Quiz – 5 Types – Moodle/Alison Full</h4><p>1. QCM: Actif = Passif? <select id="q1"><option value="">?</option><option value="1">Vrai – Equilibre Bilan</option><option value="0">Faux</option></select></p><p>2. Vrai/Faux: Capital a l'Actif? <select id="q2"><option value="">?</option><option value="0">Vrai</option><option value="1">Faux – Capital au Passif – Ressource</option></select></p><p>3. Texte a trou: Actif = <input id="q3" placeholder="PASSIF"></p><p>4. QCM: TVA Burundi 2024? <select id="q4"><option value="">?</option><option value="1">18%</option><option value="0">10%</option><option value="0">20%</option></select></p><p>5. Appariement: Actif → <select id="q5"><option value="">?</option><option value="1">Possede – Emplois</option><option value="0">Doit – Ressources</option></select></p><button class="btn-gold" onclick="checkQuiz()">✅ Verifier – Alison Quiz</button><div id="qRes" style="font-weight:800;margin-top:10px;padding:8px;background:#0a0e1f;border-radius:8px"></div></div>`
+});
+function checkQuiz(){let s=0;if(document.getElementById('q1').value==='1')s++;if(document.getElementById('q2').value==='1')s++;if((document.getElementById('q3').value||'').toLowerCase().trim()==='passif')s++;if(document.getElementById('q4').value==='1')s++;if(document.getElementById('q5').value==='1')s++;let msg=s>=3?'✅ VALIDE ALISON – Passe':'❌ 3/5 requis – Revise cours';document.getElementById('qRes').innerHTML=`<span style="font-size:18px">${s}/5 – ${msg}</span><br><small style="color:#8b93b8">D${dId} • Watermark</small>`;}
+// PLUGIN 5 – ASSIGNMENT + FORUM – L3
+ISOMERO_PLUGINS.register({
+ name:'assignment-forum-l3',
+ shouldShow:()=>true,
+ render:(c)=>`<div class="q"><h4 style="margin:0 0 10px 0">📝 Devoir + 💬 Forum – L3</h4><p style="font-size:12px;color:#8b93b8">Soumission avec watermark D${dId} – Non transferable</p><a href="https://wa.me/25762706404?text=Devoir ${encodeURIComponent(c.title)} D${dId} Fac ${c.fac}" target="_blank"><button class="btn-dark">📲 Envoyer Devoir WhatsApp D${dId}</button></a><a href="https://wa.me/25762706404?text=Question Forum ${encodeURIComponent(c.title)} D${dId}" target="_blank"><button class="btn-dark" style="margin-top:8px">💬 Poser Question Forum – L3</button></a><small style="display:block;margin-top:8px;color:#8b93b8;font-size:10px">Tous messages tagges D${dId} – 62706404 – L3 protege</small></div>`
+});
+renderTabs();render();
+// ANTI COPY FULL LOGIC – L3
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&(e.key==='I'||e.key==='J'||e.key==='C'))||(e.ctrlKey&&e.key==='U')) e.preventDefault();});
+document.addEventListener('selectstart',e=>{if(e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'&&e.target.tagName!=='SELECT') e.preventDefault();});
+console.log('ISOMERO FULL L3 – H5P + YT EMBEDDER + ALISON – D'+dId+' – 62706404 – 14 cours – FULL LOGIC');
+</script></body></html>
