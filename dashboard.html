@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISOMERO - Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<div class="bg-white shadow-sm border-b p-4 flex justify-between items-center">
+  <div><h1 class="text-xl font-bold">ISOMERO</h1><p class="text-xs text-gray-500">Dashboard intelligent</p></div>
+  <div class="flex items-center gap-3">
+    <select id="roleSwitcher" class="border rounded-lg px-3 py-2 text-sm font-medium">
+      <option value="student">Student - VIEW</option>
+      <option value="teacher">Teacher - VIEW + CREATE/EDIT OWN</option>
+      <option value="leader">Leader - VIEW + SELL</option>
+      <option value="admin" selected>Admin - ALL</option>
+    </select>
+    <div id="userBadge" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-bold"></div>
+  </div>
+</div>
+
+<div class="max-w-6xl mx-auto p-6 grid grid-cols-12 gap-6">
+  <div class="col-span-12 md:col-span-3 space-y-4">
+    <div class="bg-white rounded-xl p-4 shadow-sm"><h3 class="font-bold text-sm mb-3">Menu</h3><nav id="sideNav" class="space-y-2"></nav></div>
+    <div class="bg-white rounded-xl p-4 shadow-sm"><h3 class="font-bold text-sm">Mon Profil</h3><p id="profileInfo" class="text-xs text-gray-600 mt-2"></p></div>
+  </div>
+  <div class="col-span-12 md:col-span-9 space-y-6">
+    <div id="statsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    <div class="bg-white rounded-xl p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-4"><h2 id="coursesTitle" class="font-bold text-lg"></h2><button id="createCourseBtn" class="hidden bg-black text-white px-4 py-2 rounded-lg text-sm">+ Créer Cours</button></div>
+      <div id="coursesList" class="grid gap-3"></div>
+    </div>
+    <div id="salesSection" class="hidden bg-white rounded-xl p-6 shadow-sm"><h2 class="font-bold text-lg mb-4">💰 Mes Ventes (Leader)</h2><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="text-xs text-gray-500 border-b"><tr><th class="text-left py-2">Cours</th><th>Client</th><th>Commission</th><th>Action</th></tr></thead><tbody id="salesTable"></tbody></table></div></div>
+    <div id="usersSection" class="hidden bg-white rounded-xl p-6 shadow-sm border-2 border-red-100"><h2 class="font-bold text-lg mb-4">👥 Gestion Users (Admin Only)</h2><div class="flex gap-2 mb-4"><input id="newUserEmail" placeholder="email" class="border rounded px-3 py-2 text-sm flex-1"><select id="newUserRole" class="border rounded px-3 py-2 text-sm"><option>student</option><option>teacher</option><option>leader</option></select><button onclick="createUser()" class="bg-red-600 text-white px-4 py-2 rounded text-sm">Créer</button></div><div id="usersList" class="space-y-2"></div></div>
+  </div>
+</div>
+
+<script>
+const CURRENT_USER = { id: 'u_admin', role: 'admin', myCourses: ['fr-a1-01'], name: 'Admin Cya' };
+const ROLE_PERMS = {
+  student: { view: true, create: false, editOwn: false, editAll: false, sell: false, manageUsers: false },
+  teacher: { view: true, create: true, editOwn: true, editAll: false, sell: false, manageUsers: false },
+  leader: { view: true, create: false, editOwn: false, editAll: false, sell: true, manageUsers: false },
+  admin: { view: true, create: true, editOwn: true, editAll: true, sell: true, manageUsers: true }
+};
+function can(action, courseId = null) {
+  const p = ROLE_PERMS[CURRENT_USER.role];
+  if (action === 'view') return p.view;
+  if (action === 'create') return p.create;
+  if (action === 'edit') { if (p.editAll) return true; if (p.editOwn && courseId) return CURRENT_USER.myCourses.includes(courseId); return false; }
+  if (action === 'sell') return p.sell;
+  if (action === 'manageUsers') return p.manageUsers;
+  return false;
+}
+const COURSES = [
+  { id: 'fr-a1-01', title: 'Français A1 - Débutant', owner: 'u_teacher1', price: 15000, students: 45 },
+  { id: 'math-adv-02', title: 'Maths Avancées', owner: 'u_teacher2', price: 20000, students: 12 },
+  { id: 'en-b2-03', title: 'Anglais B2', owner: 'u_admin', price: 18000, students: 30 },
+];
+let USERS = [
+  { id: 'u_s1', email: 'etudiant1@isomero.bi', role: 'student' },
+  { id: 'u_teacher1', email: 'prof.fr@isomero.bi', role: 'teacher', myCourses: ['fr-a1-01'] },
+  { id: 'u_leader1', email: 'leader1@isomero.bi', role: 'leader', sales: 5 },
+];
+function render() {
+  const role = CURRENT_USER.role;
+  document.getElementById('userBadge').textContent = role.toUpperCase();
+  document.getElementById('profileInfo').innerHTML = `${CURRENT_USER.name}<br>Role: ${role}<br>Cours: ${CURRENT_USER.myCourses.join(', ') || 'aucun'}`;
+  let nav = `<a class="block text-sm py-2 px-3 rounded bg-gray-100">📚 Catalogue</a>`;
+  if (can('sell')) nav += `<a class="block text-sm py-2 px-3 rounded">💰 Mes Ventes</a>`;
+  if (can('manageUsers')) nav += `<a class="block text-sm py-2 px-3 rounded text-red-600 font-bold">👥 Users</a>`;
+  document.getElementById('sideNav').innerHTML = nav;
+  document.getElementById('coursesTitle').textContent = role === 'student' ? 'Mes Cours' : role === 'teacher' ? 'Mes Cours Enseignés' : role === 'leader' ? 'Catalogue à Vendre' : 'Tous les Cours (Admin)';
+  document.getElementById('createCourseBtn').classList.toggle('hidden', !can('create'));
+  let stats = '';
+  if (role === 'teacher') stats = `<div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-500">Mes Cours</p><p class="text-2xl font-bold">${CURRENT_USER.myCourses.length}</p></div><div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-500">Étudiants</p><p class="text-2xl font-bold">45</p></div>`;
+  if (role === 'leader') stats = `<div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-500">Ventes</p><p class="text-2xl font-bold">5</p></div><div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-500">Commission</p><p class="text-2xl font-bold">75k FBu</p></div>`;
+  if (role === 'admin') stats = `<div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-500">Total Users</p><p class="text-2xl font-bold">${USERS.length}</p></div><div class="bg-white p-4 rounded-xl shadow-sm"><p class="text-xs text-gray-500">Total Cours</p><p class="text-2xl font-bold">${COURSES.length}</p></div>`;
+  document.getElementById('statsGrid').innerHTML = stats;
+  document.getElementById('coursesList').innerHTML = COURSES.map(c => {
+    const canEdit = can('edit', c.id); const canSell = can('sell');
+    return `<div class="border rounded-lg p-4 flex justify-between items-center"><div><p class="font-bold text-sm">${c.title}</p><p class="text-xs text-gray-500">${c.id} • ${c.students} étudiants • ${c.price} FBu</p></div><div class="flex gap-2"><button class="border px-3 py-1 rounded text-xs">VIEW</button>${canEdit ? '<button class="bg-black text-white px-3 py-1 rounded text-xs">EDIT</button>' : ''}${canSell ? '<button class="bg-green-600 text-white px-3 py-1 rounded text-xs">SELL</button>' : ''}</div></div>`;
+  }).join('');
+  document.getElementById('salesSection').classList.toggle('hidden', !can('sell'));
+  document.getElementById('usersSection').classList.toggle('hidden', !can('manageUsers'));
+  if (can('sell')) document.getElementById('salesTable').innerHTML = `<tr class="border-b text-xs"><td class="py-2">Français A1</td><td>Jean N.</td><td>3,000 FBu</td><td><span class="bg-green-100 text-green-800 px-2 py-1 rounded">Payé</span></td></tr>`;
+  if (can('manageUsers')) document.getElementById('usersList').innerHTML = USERS.map(u => `<div class="flex justify-between border-b py-2 text-xs"><span>${u.email}</span><span class="bg-gray-100 px-2 py-1 rounded">${u.role}</span></div>`).join('');
+}
+function createUser() {
+  const email = document.getElementById('newUserEmail').value;
+  const role = document.getElementById('newUserRole').value;
+  if (!email) return alert('email requis');
+  USERS.push({ id: 'u_'+Date.now(), email, role });
+  document.getElementById('newUserEmail').value = ''; render();
+}
+document.getElementById('roleSwitcher').addEventListener('change', e => {
+  CURRENT_USER.role = e.target.value;
+  if (e.target.value === 'teacher') { CURRENT_USER.myCourses = ['fr-a1-01']; CURRENT_USER.name = 'Prof Français'; }
+  if (e.target.value === 'leader') { CURRENT_USER.myCourses = []; CURRENT_USER.name = 'Leader Ventes'; }
+  if (e.target.value === 'student') { CURRENT_USER.myCourses = []; CURRENT_USER.name = 'Etudiant'; }
+  if (e.target.value === 'admin') { CURRENT_USER.myCourses = ['fr-a1-01','en-b2-03']; CURRENT_USER.name = 'Admin Cya'; }
+  render();
+});
+render();
+</script>
+</body>
+</html>
