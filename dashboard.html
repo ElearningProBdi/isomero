@@ -3,59 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ISOMERO - Dashboard Systématique V3</title>
+<title>ISOMERO - Permissions Final</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
-<div class="bg-yellow-100 border-b p-3 flex gap-3">
-  <span class="text-xs font-bold">DEV:</span>
-  <select id="roleSwitcher" onchange="document.getElementById('roleBadge').textContent=this.value.toUpperCase()" class="text-sm border rounded px-2 py-1">
-    <option value="teacher" selected>Teacher</option>
-    <option value="student">Student</option>
-    <option value="admin">Admin</option>
-  </select>
+<div class="bg-yellow-100 border-b p-3 flex gap-3 items-center">
+<span class="text-xs font-bold">DEV MODE:</span>
+<select id="roleSwitcher" onchange="applyPermissions()" class="text-sm border rounded px-2 py-1">
+<option value="teacher" selected>Teacher</option>
+<option value="student">Student</option>
+<option value="admin">Admin</option>
+</select>
 </div>
-<header class="bg-white p-4 flex justify-between">
-  <h1 class="text-xl font-bold">ISOMERO <span id="roleBadge" class="text-xs bg-black text-white px-2 py-1 rounded ml-2">TEACHER</span></h1>
-  <button onclick="openCreateModal()" class="bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold">+ Créer Cours</button>
+<header class="bg-white shadow-sm p-4 flex justify-between items-center">
+<h1 class="text-xl font-bold">ISOMERO <span id="roleBadge" class="text-xs bg-black text-white px-2 py-1 rounded ml-2"></span></h1>
+<button id="createBtn" onclick="openCreateModal()" class="bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold">+ Créer Cours</button>
 </header>
 <main class="p-6 max-w-6xl mx-auto">
-  <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
+<div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
 </main>
 <div id="createModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl p-6 w-full max-w-md">
-    <h3 class="font-bold mb-4">Nouveau Cours</h3>
-    <input id="newTitle" placeholder="Titre" class="w-full border rounded-xl p-3.5 mb-3">
-    <input id="newPrice" type="number" placeholder="Prix RWF" class="w-full border rounded-xl p-3.5 mb-6">
-    <div class="flex gap-3 justify-end">
-      <button onclick="closeCreateModal()" class="px-5 py-2">Annuler</button>
-      <button onclick="confirmCreateCourse()" class="bg-black text-white px-7 py-2.5 rounded-xl">Créer</button>
-    </div>
-  </div>
+<div class="bg-white rounded-2xl p-6 w-full max-w-md">
+<h3 class="font-bold mb-4">Nouveau Cours</h3>
+<input id="newTitle" placeholder="Titre" class="w-full border rounded-xl p-3.5 mb-3">
+<input id="newPrice" type="number" placeholder="Prix RWF" class="w-full border rounded-xl p-3.5 mb-6">
+<div class="flex gap-3 justify-end"><button onclick="closeCreateModal()" class="px-5 py-2">Annuler</button><button onclick="confirmCreateCourse()" class="bg-black text-white px-7 py-2.5 rounded-xl">Créer</button></div>
+</div>
 </div>
 <div id="editModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl p-6 w-full max-w-md">
-    <h3 class="font-bold mb-4">Éditer Cours</h3>
-    <input id="editTitle" class="w-full border rounded-xl p-3.5 mb-3">
-    <input id="editPrice" type="number" class="w-full border rounded-xl p-3.5 mb-6">
-    <input type="hidden" id="editId">
-    <div class="flex gap-3 justify-end">
-      <button onclick="closeEditModal()" class="px-5 py-2">Annuler</button>
-      <button onclick="confirmEditCourse()" class="bg-black text-white px-7 py-2.5 rounded-xl">Sauvegarder</button>
-    </div>
-  </div>
+<div class="bg-white rounded-2xl p-6 w-full max-w-md">
+<h3 class="font-bold mb-4">Éditer Cours</h3>
+<input id="editTitle" class="w-full border rounded-xl p-3.5 mb-3"><input id="editPrice" type="number" class="w-full border rounded-xl p-3.5 mb-6"><input type="hidden" id="editId">
+<div class="flex gap-3 justify-end"><button onclick="closeEditModal()" class="px-5 py-2">Annuler</button><button onclick="confirmEditCourse()" class="bg-black text-white px-7 py-2.5 rounded-xl">Sauvegarder</button></div>
+</div>
 </div>
 <script>
-let COURSES=[{id:'c1',title:'Français A1',price:20000,students:12},{id:'c2',title:'Anglais Business',price:25000,students:8}];
-function openCreateModal(){document.getElementById('createModal').classList.remove('hidden')}
-function closeCreateModal(){document.getElementById('createModal').classList.add('hidden');document.getElementById('newTitle').value='';document.getElementById('newPrice').value=''}
-function confirmCreateCourse(){const t=document.getElementById('newTitle').value.trim();const p=parseInt(document.getElementById('newPrice').value)||15000;if(!t){alert('Titre requis');return}COURSES.push({id:'c_'+Date.now(),title:t,price:p,students:0});closeCreateModal();render()}
-function openEditModal(id){const c=COURSES.find(x=>x.id===id);document.getElementById('editId').value=id;document.getElementById('editTitle').value=c.title;document.getElementById('editPrice').value=c.price;document.getElementById('editModal').classList.remove('hidden')}
-function closeEditModal(){document.getElementById('editModal').classList.add('hidden')}
-function confirmEditCourse(){const id=document.getElementById('editId').value;const c=COURSES.find(x=>x.id===id);c.title=document.getElementById('editTitle').value.trim()||c.title;c.price=parseInt(document.getElementById('editPrice').value)||c.price;closeEditModal();render()}
-function deleteCourse(id){if(!confirm('Supprimer ?'))return;COURSES=COURSES.filter(c=>c.id!==id);render()}
-function render(){const grid=document.getElementById('coursesGrid');grid.innerHTML='';COURSES.forEach(course=>{const card=document.createElement('div');card.className='bg-white rounded-2xl p-6 border hover:border-black cursor-pointer group';card.innerHTML=`<div onclick="openEditModal('${course.id}')"><h3 class="font-bold group-hover:underline">${course.title}</h3><p class="text-xs text-gray-500 mb-4">${course.price} RWF • ${course.students} étudiants</p><div class="bg-gray-50 rounded-xl p-3 text-xs text-gray-400">Clique pour éditer</div></div><div class="flex gap-2 mt-4"><button onclick="openEditModal('${course.id}')" class="flex-1 bg-black text-white py-2.5 rounded-xl text-sm font-bold">✏️ Éditer</button><button onclick="deleteCourse('${course.id}')" class="px-4 text-red-500">✕</button></div>`;grid.appendChild(card)})}
-render();
-</script>
-</body>
-</html>
+const PERMISSIONS = {
+student: { canCreateCourse: false, canEditCourse: false, canDeleteCourse: false, label: "Lecture seule" },
+teacher: { canCreateCourse: true, canEditCourse: true, canDeleteCourse: true, label: "Peut tout gérer" },
+admin: { canCreateCourse: true, canEditCourse: true, canDeleteCourse: true, label: "Admin total" },
+};
+function can(action) { const role = document.getElementById('roleSwitcher').value; return PERMISSIONS[role]?.[action] || false; }
+function applyPermissions()
