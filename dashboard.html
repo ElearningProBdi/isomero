@@ -1,47 +1,18 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ISOMERO - Permissions Final</title>
-<script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 min-h-screen">
-<div class="bg-yellow-100 border-b p-3 flex gap-3 items-center">
-<span class="text-xs font-bold">DEV MODE:</span>
-<select id="roleSwitcher" onchange="applyPermissions()" class="text-sm border rounded px-2 py-1">
-<option value="teacher" selected>Teacher</option>
-<option value="student">Student</option>
-<option value="admin">Admin</option>
-</select>
-</div>
-<header class="bg-white shadow-sm p-4 flex justify-between items-center">
-<h1 class="text-xl font-bold">ISOMERO <span id="roleBadge" class="text-xs bg-black text-white px-2 py-1 rounded ml-2"></span></h1>
-<button id="createBtn" onclick="openCreateModal()" class="bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold">+ Créer Cours</button>
-</header>
-<main class="p-6 max-w-6xl mx-auto">
-<div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
-</main>
-<div id="createModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-<div class="bg-white rounded-2xl p-6 w-full max-w-md">
-<h3 class="font-bold mb-4">Nouveau Cours</h3>
-<input id="newTitle" placeholder="Titre" class="w-full border rounded-xl p-3.5 mb-3">
-<input id="newPrice" type="number" placeholder="Prix RWF" class="w-full border rounded-xl p-3.5 mb-6">
-<div class="flex gap-3 justify-end"><button onclick="closeCreateModal()" class="px-5 py-2">Annuler</button><button onclick="confirmCreateCourse()" class="bg-black text-white px-7 py-2.5 rounded-xl">Créer</button></div>
-</div>
-</div>
-<div id="editModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-<div class="bg-white rounded-2xl p-6 w-full max-w-md">
-<h3 class="font-bold mb-4">Éditer Cours</h3>
-<input id="editTitle" class="w-full border rounded-xl p-3.5 mb-3"><input id="editPrice" type="number" class="w-full border rounded-xl p-3.5 mb-6"><input type="hidden" id="editId">
-<div class="flex gap-3 justify-end"><button onclick="closeEditModal()" class="px-5 py-2">Annuler</button><button onclick="confirmEditCourse()" class="bg-black text-white px-7 py-2.5 rounded-xl">Sauvegarder</button></div>
-</div>
-</div>
-<script>
-const PERMISSIONS = {
-student: { canCreateCourse: false, canEditCourse: false, canDeleteCourse: false, label: "Lecture seule" },
-teacher: { canCreateCourse: true, canEditCourse: true, canDeleteCourse: true, label: "Peut tout gérer" },
-admin: { canCreateCourse: true, canEditCourse: true, canDeleteCourse: true, label: "Admin total" },
-};
-function can(action) { const role = document.getElementById('roleSwitcher').value; return PERMISSIONS[role]?.[action] || false; }
-function applyPermissions()
+function can(action, role, licenceCount, courseOwnerId, currentUserId) {
+  if (!PERMISSIONS[role][action]) return false;
+
+  // 10 licences rule
+  if ((action === 'canCreateCourse' || action === 'canEditCourse') && (role === 'teacher' || role === 'leader')) {
+    if (licenceCount < MIN_LICENCES_PER_YEAR) return false;
+  }
+
+  // OWNER ONLY rule - Teacher & Leader only their courses
+  if (action === 'canEditCourse' && (role === 'teacher' || role === 'leader')) {
+    return courseOwnerId === currentUserId; // Can only edit OWN
+  }
+
+  // Admin can edit/delete all
+  if (role === 'admin') return true;
+
+  return true;
+}
