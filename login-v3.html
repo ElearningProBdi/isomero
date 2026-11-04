@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><title>ISOMERO V3</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>body{font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;background:#f5f5f5}.card{background:white;padding:30px;border-radius:12px;width:320px;box-shadow:0 4px 20px rgba(0,0,0,.1)}input{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ddd}button{width:100%;padding:12px;background:#000;color:#fff;border:none;border-radius:8px;margin-top:10px}</style>
+</head>
+<body>
+<div class="card"><h2>ISOMERO Login V3</h2>
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<button onclick="signup()" style="background:#555">Sign Up</button>
+<p id="msg"></p></div>
+<script>
+const supabaseClient = supabase.createClient('https://dssmkfgtktvglubpmecb.supabase.co','sb_publishable_L2_DwAnHggEtaIuaEKRwwQ_vNzpbhW_');
+async function login(){const e=document.getElementById('email').value,p=document.getElementById('password').value;const{data,error}=await supabaseClient.auth.signInWithPassword({email:e,password:p});document.getElementById('msg').innerText=error?error.message:'Success! Welcome '+data.user.email}
+async function signup(){const e=document.getElementById('email').value,p=document.getElementById('password').value;const{data,error}=await supabaseClient.auth.signUp({email:e,password:p});document.getElementById('msg').innerText=error?error.message:'Check email! Account created'}
+</script>
+</body>
+</html>
