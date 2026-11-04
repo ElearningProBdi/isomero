@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ISOMERO - All Levels</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;background:#f5f5f5;color:#222;padding:16px}
+h1{color:#1a73e8;margin:0 0 10px}h2{margin:20px 0 10px}.top{display:flex;gap:10px;flex-wrap:wrap}
+button{cursor:pointer;background:#1a73e8;color:#fff;border:none;padding:9px 14px;border-radius:6px;font-weight:700}
+button.ghost{background:#fff;color:#1a73e8;border:1px solid #1a73e8}
+.card{background:#fff;border-radius:10px;padding:14px;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:700}.free{background:#e6f4ea;color:#137333}.paid{background:#fef7e0;color:#7a5a00}
+.step{border-left:4px solid #1a73e8;padding:8px 0 8px 12px;margin:12px 0}.step b{color:#1a73e8}
+input,select{padding:8px;border:1px solid #ddd;border-radius:6px;width:100%}label{font-size:13px;color:#555}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.q{margin:8px 0}.small{font-size:13px;color:#555}
+</style></head><body>
+<h1>ISOMERO - English</h1>
+<p class="small"><b>Locked Structure:</b> 13 Levels | Each Level = 8 Units | Each Unit = 9 Steps | Each Level Test = 40 Questions</p>
+<div id="levels"></div>
+<div id="units"></div>
+<div id="detail"></div>
+<div id="test"></div>
+
+<script>
+// ============ 1. LEVELS - 13 TOTAL ============
+const LEVELS=[
+{id:"Pre-A1",title:"Pre-Beginner - Discovery",desc:"Start from zero. Alphabet, greetings, numbers, colors.",free:true},
+{id:"A1.1",title:"Beginner 1 - A1.1",desc:"Introduce yourself, family, daily life. To be, to have, present simple.",free:false},
+{id:"A1.2",title:"Beginner 2 - A1.2",desc:"Shop, order food, directions. Articles and daily verbs.",free:false},
+{id:"A2.1",title:"Elementary 1 - A2.1",desc:"Talk about your day, hobbies. Past simple.",free:false},
+{id:"A2.2",title:"Elementary 2 - A2.2",desc:"Travel, hotel, plans. Future and present perfect.",free:false},
+{id:"B1.1",title:"Intermediate 1 - B1.1",desc:"Opinions, work, experiences. Conditionals.",free:false},
+{id:"B1.2",title:"Intermediate 2 - B1.2",desc:"Debate, emails, interviews. Passive, reported speech.",free:false},
+{id:"B2.1",title:"Independent 1 - B2.1",desc:"Movies, news. Advanced conditionals, phrasal verbs.",free:false},
+{id:"B2.2",title:"Independent 2 - B2.2",desc:"Present, negotiate. IELTS / TOEFL.",free:false},
+{id:"C1.1",title:"Advanced 1 - C1.1",desc:"Fluent, essays, advanced vocab.",free:false},
+{id:"C1.2",title:"Advanced 2 - C1.2",desc:"University presentations, academic English.",free:false},
+{id:"C2.1",title:"Mastery 1 - C2.1",desc:"Subtleties, humour, idioms.",free:false},
+{id:"C2.2",title:"Mastery 2 - C2.2",desc:"Total mastery, debate, dissertations.",free:false}
+];
+
+// ============ 2. UNITS - 8 PER LEVEL - TITLE + LANGUAGE FORMS ============
+const UNITS={
+"Pre-A1":[
+{t:"Hello & Goodbye",f:"Pronouns: I, You"},{t:"Alphabet A-Z",f:"Articles: a / an"},{t:"Numbers 1-20",f:"Numbers + To Be: I am"},{t:"Colors",f:"To Be: It is red"},{t:"Greetings",f:"To Be: I am / You are"},{t:"My Name Is",f:"To Be: He is / She is"},{t:"My Family Words",f:"Possessive: my"},{t:"Thank You & Goodbye",f:"Polite phrases"}],
+"A1.1":[
+{t:"Introduce Yourself",f:"To Be: I am / You are / He is"},{t:"My Family",f:"Possessive: my, your, his, her"},{t:"My Daily Life",f:"Present Simple"},{t:"I Have a Brother",f:"To Have: have / has"},{t:"This Is My House",f:"This / That / These / Those"},{t:"My Friends",f:"Plural: -s / -es"},{t:"My City",f:"There is / There are + Prepositions"},{t:"My Free Time",f:"Present Simple + Can / Can't"}],
+"A1.2":[
+{t:"Shopping",f:"Articles: a / an / the / some / any"},{t:"Order Food",f:"There is / There are + Would like"},{t:"Ask Directions",f:"Prepositions: in, on, at, next to"},{t:"What Are You Doing?",f:"Present Continuous"},{t:"I Can Swim",f:"Can / Can't for Ability"},{t:"My Clothes",f:"Adjectives + This is / These are"},{t:"At The Market",f:"How much / How many"},{t:"My Week",f:"Days + Present Simple vs Continuous"}],
+"A2.1":[
+{t:"My Day Yesterday",f:"Past Simple Regular -ed"},{t:"A Trip",f:"Past Simple Irregular"},{t:"While I Was Walking",f:"Past Continuous"},{t:"My Hobbies",f:"Comparatives"},{t:"My Home",f:"Superlatives"},{t:"My Routine",f:"Adverbs of Frequency"},{t:"At School",f:"Past Simple Questions"},{t:"My Weekend",f:"Past Simple + ago"}],
+"A2.2":[
+{t:"Travel Plans",f:"Future: going to"},{t:"Book a Hotel",f:"Future: will"},{t:"I Have Visited",f:"Present Perfect"},{t:"Yesterday vs Ever",f:"Past Simple vs Present Perfect"},{t:"You Must / Should",f:"Must / Have to / Should"},{t:"If It Rains",f:"First Conditional"},{t:"At The Airport",f:"Future + Prepositions"},{t:"My Dreams",f:"Future + Want to"}],
+"B1.1":[
+{t:"Work & Experience",f:"Present Perfect Continuous"},{t:"Before That",f:"Past Perfect"},{t:"If I Were Rich",f:"Second Conditional"},{t:"When I Was Young",f:"Used to"},{t:"Give Your Opinion",f:"Relative: who, which, that"},{t:"My Job",f:"Present Perfect vs Past Simple"},{t:"Talk About Health",f:"Should / Must + Vocabulary"},{t:"My Future Plans",f:"Future Continuous + Will"}],
+"B1.2":[
+{t:"Formal Email",f:"Passive Voice"},{t:"Job Interview",f:"Reported Speech"},{t:"If I Had Known",f:"Third Conditional"},{t:"I Like Swimming",f:"Gerund vs Infinitive"},{t:"Debate",f:"Question Tags"},{t:"My City Problems",f:"Passive + Modals"},{t:"Tell a Story",f:"Past Perfect + Past Simple"},{t:"Give Advice",f:"Should have / Could have"}],
+"B2.1":[
+{t:"Movies & News",f:"Mixed Conditionals"},{t:"Phrasal Verbs",f:"Give up, Look after, etc."},{t:"I Wish",f:"Wish / If only"},{t:"I Should Have",f:"Modal Perfect"},{t:"Not Only...",f:"Inversion"},{t:"Technology",f:"Passive Advanced"},{t:"Environment",f:"Conditionals + Vocabulary"},{t:"Culture",f:"Reported Speech Advanced"}],
+"B2.2":[
+{t:"Present a Project",f:"Causative: have it done"},{t:"Negotiate",f:"Reporting Verbs"},{t:"Defend Your Idea",f:"Cleft Sentences"},{t:"IELTS / TOEFL",f:"Connectors: Despite, However"},{t:"Business English",f:"Formal Vocabulary + Passive"},{t:"University Life",f:"Academic Connectors"},{t:"Social Media",f:"Gerund + Passive"},{t:"Final Presentation",f:"All B2 Grammar Review"}],
+"C1.1":[
+{t:"Complex Topics",f:"Subjunctive"},{t:"Structured Essay",f:"Nominalization"},{t:"Advanced Vocabulary",f:"Discourse Markers"},{t:"Debate",f:"Ellipsis + Emphasis"},{t:"Politics & Society",f:"Hedging"},{t:"Science",f:"Complex Passive"},{t:"Literature",f:"Stylistic Structures"},{t:"Essay Writing",f:"All C1.1 Review"}],
+"C1.2":[
+{t:"University Presentation",f:"Academic: It is argued that..."},{t:"Analyze a Text",f:"Hedging: may, might, tends to"},{t:"Academic Writing",f:"Complex Passive"},{t:"Research",f:"Citation Structures"},{t:"Critical Thinking",f:"Argument Structures"},{t:"Public Speaking",f:"Rhetorical Structures"},{t:"Thesis",f:"Academic Grammar"},{t:"Final Thesis",f:"All C1.2 Review"}],
+"C2.1":[
+{t:"Humour & Idioms",f:"Idiomatic Grammar"},{t:"Subtleties",f:"Stylistic Inversion"},{t:"Irony & Sarcasm",f:"Nuance"},{t:"Storytelling",f:"Narrative Tenses Mastery"},{t:"Poetry",f:"Poetic Structures"},{t:"Film Analysis",f:"Advanced Vocabulary"},{t:"Philosophy",f:"Abstract Grammar"},{t:"Native Fluency",f:"All C2.1 Review"}],
+"C2.2":[
+{t:"Debate Like a Native",f:"All Grammar in Debate"},{t:"Dissertation",f:"All Grammar in Writing"},{t:"Negotiation Mastery",f:"Persuasion Structures"},{t:"Teaching English",f:"Explain Grammar"},{t:"Translation",f:"Nuance Translation"},{t:"Culture Mastery",f:"Cultural Idioms"},{t:"Professional Mastery",f:"Formal Mastery"},{t:"Final Mastery Exam",f:"All C2 Review"}]
+};
+
+// ============ 3. RENDER LEVELS ============
+let currentLevel="A1.1", currentUnit=0;
+function renderLevels(){
+  let h=`<div class="grid">`;
+  LEVELS.forEach(l=>{
+    h+=`<div class="card"><span class="badge ${l.free?"free":"paid"}">${l.free?"FREE":"Paid"}</span> <b>${l.id} - ${l.title}</b><p class="small">${l.desc}</p><p class="small">8 Units | Test 40Q</p><button onclick="openLevel('${l.id}')">Open Level</button></div>`;
+  });
+  h+=`</div>`; document.getElementById("levels").innerHTML=h;
+}
+function openLevel(id){
+  currentLevel=id; document.getElementById("detail").innerHTML=""; document.getElementById("test").innerHTML="";
+  let h=`<h2>${id} - 8 Units</h2><div class="grid">`;
+  UNITS[id].forEach((u,i)=>{
+    h+=`<div class="card"><b>Unit ${i+1}: ${u.t}</b><p class="small">${u.f}</p><button onclick="openUnit(${i})">Start Unit</button></div>`;
+  });
+  h+=`</div><div class="card"><b>${id} LEVEL TEST - 40 Questions</b><p class="small">10 Grammar + 10 Vocabulary + 10 Reading + 10 Listening/Dialogue. Pass 70% = 28/40</p><button onclick="openTest()">Start Level Test</button></div>`;
+  document.getElementById("units").innerHTML=h;
+  window.scrollTo(0,document.getElementById("units").offsetTop);
+}
+
+// ============ 4. RENDER UNIT - 9 STEPS ============
+function openUnit(i){
+  currentUnit=i; let u=UNITS[currentLevel][i];
+  let uid=`${currentLevel}-U${i+1}`;
+  document.getElementById("test").innerHTML="";
+  document.getElementById("detail").innerHTML=`
+  <div class="card"><h2>${uid} - ${u.t}</h2>
+  <div class="step"><b>1. UNIT PREVIEW</b><br>Title: ${u.t}<br>Description: Learn ${u.t.toLowerCase()} in ${currentLevel}.<br>Language Forms Used: ${u.f}</div>
+  <div class="step"><b>2. DIALOGUE - ${u.t} + ${u.f}</b><br><i>Paste your dialogue here for ${uid}.</i><br>Example: A: Hi! My name is John. B: Hi! My name is Anna.<br><audio controls></audio></div>
+  <div class="step"><b>3. LISTENING - REPEAT AFTER ME (H5P)</b><br>Play / Stop / Speak / Feedback<br><i>Paste H5P embed here</i><br><button>▶ Play</button> <button>■ Stop</button> <button>🎤 Speak</button> <button>Feedback</button></div>
+  <div class="step"><b>4. ALISON QUIZ - Related to Dialogue</b><br>1. MCQ: ___<br>2. True/False: ___<br>3. Fill Blank: ___<br>4. Match: ___<br>5. Order Words: ___<br><i>Paste Alison quiz embed here</i></div>
+  <div class="step"><b>5. YOUTUBE VIDEO - ${u.f}</b><br><i>Paste YouTube link for ${u.f}</i><br><input placeholder="https://youtube.com/watch?v=..."></div>
+  <div class="step"><b>6. GRAMMAR EXERCISE - ${u.f}</b><br>1. Fill: I ___ Anna. (am)<br>2. Fill: She ___ from Bujumbura. (is)<br>3. Correct the sentence<br><input placeholder="Your answer"></div>
+  <div class="step"><b>7. READING COMPREHENSION - Audio + Script</b><br><audio controls></audio><br><i>Paste reading script for ${uid} here.</i><br>My name is Anna. I am 19. I am from Bujumbura...</div>
+  <div class="step"><b>8. SKIMMING & SCANNING</b><br>Skim: What is the text about?<br>Scan: How old is Anna? → 19<br>Scan: Where is she from? → Bujumbura<br><input placeholder="Your answer"></div>
+  <div class="step"><b>9. VOCABULARY QUIZ</b><br>Hello = Bonjour | Name = Nom | Meet = Rencontrer<br><label>Match: Hello = <select><option>Bonjour</option><option>Merci</option></select></label></div>
+  <button onclick="openTest()">Go to Level Test →</button>
+  </div>`;
+  window.scrollTo(0,document.getElementById("detail").offsetTop);
+}
+
+// ============ 5. LEVEL TEST - 40 QUESTIONS ============
+function openTest(){
+  let h=`<div class="card"><h2>${currentLevel} - LEVEL TEST - 40 Questions</h2><p class="small">10 Grammar + 10 Vocabulary + 10 Reading + 10 Listening. Pass 70%.</p>`;
+  const sections=[["Grammar - 10Q",10],["Vocabulary - 10Q",10],["Reading - Skim/Scan - 10Q",10],["Listening / Dialogue - 10Q",10]];
+  let n=1;
+  sections.forEach(s=>{
+    h+=`<h3>${s[0]}</h3>`;
+    for(let i=0;i<s[1];i++){ h+=`<div class="q">${n}. Question ${n} for ${currentLevel} - ${UNITS[currentLevel][Math.floor((n-1)/5)].t} - <input placeholder="Answer ${n}"></div>`; n++; }
+  });
+  h+=`<button onclick="alert('Test submitted! Score: __ / 40. Pass = 28/40')">Submit Test - 40Q</button></div>`;
+  document.getElementById("test").innerHTML=h;
+  window.scrollTo(0,document.getElementById("test").offsetTop);
+}
+renderLevels(); openLevel("A1.1");
+</script></body></html>
