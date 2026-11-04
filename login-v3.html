@@ -13,7 +13,7 @@
 <p id="msg"></p></div>
 <script>
 const supabaseClient = supabase.createClient('https://dssmkfgtktvglubpmecb.supabase.co','sb_publishable_L2_DwAnHggEtaIuaEKRwwQ_vNzpbhW_');
-async function login(){const e=document.getElementById('email').value,p=document.getElementById('password').value;const{data,error}=await supabaseClient.auth.signInWithPassword({email:e,password:p});document.getElementById('msg').innerText=error?error.message:'Success! Welcome '+data.user.email}
+async function login(){const e=document.getElementById('email').value,p=document.getElementById('password').value;const{data,error}=await supabaseClient.auth.signInWithPassword({email:e,password:p});if(error){document.getElementById('msg').innerText=error.message}else{document.getElementById('msg').innerText='Success! Welcome '+data.user.email;setTimeout(()=>{window.location.href='dashboard.html'},1000)}}
 async function signup(){const e=document.getElementById('email').value,p=document.getElementById('password').value;const{data,error}=await supabaseClient.auth.signUp({email:e,password:p});document.getElementById('msg').innerText=error?error.message:'Check email! Account created'}
 </script>
 </body>
