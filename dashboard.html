@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ISOMERO Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>body{font-family:sans-serif;display:flex;justify-content:center;padding:20px;background:#f0f2f5}.card{background:white;padding:25px;border-radius:15px;width:100%;max-width:400px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.1)}button{background:#000;color:#fff;border:none;padding:12px;width:100%;border-radius:8px;font-size:16px;margin-top:10px}#logout{background:#e74c3c}</style>
+</head>
+<body>
+<div class="card">
+<h1>ISOMERO 🎉</h1>
+<p>Welcome back!</p>
+<h2 id="email">Loading...</h2>
+<p>You are logged in successfully.</p>
+<button onclick="window.location.href='index.html'">Home</button>
+<button id="logout" onclick="logout()">Logout</button>
+</div>
+<script>
+const supabaseClient = supabase.createClient('https://dssmkfgtktvglubpmecb.supabase.co','sb_publishable_L2_DwAnHggEtaIuaEKRwwQ_vNzpbhW_');
+async function check(){
+ const {data:{user}} = await supabaseClient.auth.getUser();
+ if(!user){ window.location.href='login-v3.html'; return; }
+ document.getElementById('email').innerText = user.email;
+}
+async function logout(){ await supabaseClient.auth.signOut(); window.location.href='login-v3.html'; }
+check();
+</script>
+</body>
+</html>
