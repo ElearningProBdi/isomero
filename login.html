@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ISOMERO - Login V2</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-6">
+<div class="bg-white w-full max-w-sm rounded-2xl border p-6 shadow-sm">
+<h1 class="font-bold text-xl text-center">ISOMERO</h1><p class="text-center text-sm text-gray-500 mt-1">Login - No Debt V2</p>
+
+<div class="mt-6 space-y-4">
+<select id="role" class="w-full border rounded-xl p-3 text-sm"><option value="teacher">Teacher</option><option value="leader">Leader</option><option value="student">Student</option><option value="admin">Admin</option></select>
+<input id="email" class="w-full border rounded-xl p-3 text-sm" placeholder="email - test@isomero.bi" value="test@isomero.bi">
+<input id="password" type="password" class="w-full border rounded-xl p-3 text-sm" placeholder="password - 123456" value="123456">
+<input id="lic" type="number" class="w-full border rounded-xl p-3 text-sm" placeholder="licences/year" value="12">
+<button onclick="login()" class="w-full bg-black text-white rounded-xl py-3 text-sm font-bold">Login → Dashboard</button>
+<p id="error" class="text-red-500 text-xs text-center hidden"></p>
+</div>
+
+<div class="mt-6 bg-gray-50 rounded-xl p-3 text-xs text-gray-500">
+<strong>Test:</strong><br>
+Teacher 12 lic → can create/edit own<br>
+Teacher 5 lic → view only<br>
+Student → view only
+</div>
+</div>
+
+<script>
+const RULES = { MIN_LICENCES: 10 };
+function login(){
+  const role = document.getElementById('role').value;
+  const lic = parseInt(document.getElementById('lic').value)||0;
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('password').value.trim();
+  const err = document.getElementById('error');
+  
+  if(!email || !pass){ err.textContent='Email and password required'; err.classList.remove('hidden'); return; }
+  
+  // Save auth - NO DEBT, single source of truth
+  localStorage.setItem('isomero_role', role);
+  localStorage.setItem('isomero_lic', lic.toString());
+  localStorage.setItem('isomero_user', email);
+  localStorage.setItem('isomero_id', 'user_123'); // Will be real ID later
+  
+  // Go to dashboard V1.1 which will read from localStorage
+  window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>
