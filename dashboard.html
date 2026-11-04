@@ -2,25 +2,45 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ISOMERO Dashboard</title>
+<title>ISOMERO Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>body{font-family:sans-serif;display:flex;justify-content:center;padding:20px;background:#f0f2f5}.card{background:white;padding:25px;border-radius:15px;width:100%;max-width:400px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.1)}button{background:#000;color:#fff;border:none;padding:12px;width:100%;border-radius:8px;font-size:16px;margin-top:10px}#logout{background:#e74c3c}</style>
+<style>body{font-family:sans-serif;background:#f0f2f5;margin:0;padding:15px}.top{background:#000;color:#fff;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center}.card{background:#fff;padding:20px;border-radius:12px;margin-top:15px;box-shadow:0 2px 10px rgba(0,0,0,.1)}button{width:100%;padding:14px;border:none;border-radius:8px;font-size:16px;margin-top:10px;background:#000;color:#fff}.red{background:#e74c3c}.green{background:#27ae60}.blue{background:#1877f2}h2{margin:0}</style>
 </head>
 <body>
-<div class="card">
-<h1>ISOMERO 🎉</h1>
-<p>Welcome back!</p>
-<h2 id="email">Loading...</h2>
-<p>You are logged in successfully.</p>
-<button onclick="window.location.href='index.html'">Home</button>
-<button id="logout" onclick="logout()">Logout</button>
+<div class="top"><div><b>ISOMERO ADMIN</b><br><span id="email">Loading...</span></div><button onclick="logout()" style="width:auto;background:#e74c3c;padding:8px 15px;margin:0">Logout</button></div>
+
+<div class="card"><h3>📊 Quick Stats</h3><p>Total Users: <b id="usersCount">...</b></p><p>Total Orders: <b id="ordersCount">...</b></p><p>Total Products: <b id="productsCount">...</b></p></div>
+
+<div class="card"><h3>🛠 Admin Actions</h3>
+<button class="green" onclick="alert('Add Product - Coming next! We will build this next')">+ Add Product</button>
+<button class="blue" onclick="showUsers()">👥 View Users</button>
+<button onclick="showOrders()">📦 View Orders</button>
+<div id="list"></div>
 </div>
+
 <script>
 const supabaseClient = supabase.createClient('https://dssmkfgtktvglubpmecb.supabase.co','sb_publishable_L2_DwAnHggEtaIuaEKRwwQ_vNzpbhW_');
 async function check(){
  const {data:{user}} = await supabaseClient.auth.getUser();
  if(!user){ window.location.href='login-v3.html'; return; }
  document.getElementById('email').innerText = user.email;
+ loadStats();
+}
+async function loadStats(){
+ const u = await supabaseClient.from('profiles').select('*',{count:'exact',head:true});
+ const o = await supabaseClient.from('orders').select('*',{count:'exact',head:true});
+ const p = await supabaseClient.from('products').select('*',{count:'exact',head:true});
+ if(u.count!==null) document.getElementById('usersCount').innerText=u.count;
+ if(o.count!==null) document.getElementById('ordersCount').innerText=o.count;
+ if(p.count!==null) document.getElementById('productsCount').innerText=p.count;
+}
+async function showUsers(){
+ const {data} = await supabaseClient.from('profiles').select('*').limit(20);
+ document.getElementById('list').innerHTML = '<h4>Users</h4>' + (data?.map(x=>'<p>'+ (x.email||x.id) +'</p>').join('') || 'No users table yet - we will create it');
+}
+async function showOrders(){
+ const {data} = await supabaseClient.from('orders').select('*').limit(20);
+ document.getElementById('list').innerHTML = '<h4>Orders</h4>' + (data?.map(x=>'<p>Order: '+JSON.stringify(x).slice(0,100)+'</p>').join('') || 'No orders yet');
 }
 async function logout(){ await supabaseClient.auth.signOut(); window.location.href='login-v3.html'; }
 check();
