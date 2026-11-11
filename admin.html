@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ISOMERO Admin</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:#fff;padding:20px}
+.box{background:#fff;color:#000;padding:20px;border-radius:14px;max-width:600px;margin:auto}
+input,select{width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px}
+button{width:100%;padding:12px;background:#0d6efd;color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+.user{background:#f1f5f9;padding:10px;border-radius:10px;margin:8px 0}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>ISOMERO Admin</h2>
+<p id="status">Checking...</p>
+<div id="list"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// 👇 PASTE YOUR firebaseConfig HERE - from Firebase > Project Settings
+const firebaseConfig = {
+  apiKey: "PASTE-YOURS",
+  authDomain: "PASTE-YOURS",
+  projectId: "PASTE-YOURS",
+  storageBucket: "PASTE-YOURS",
+  messagingSenderId: "PASTE-YOURS",
+  appId: "PASTE-YOURS"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async (user) => {
+  if(!user){ document.getElementById('status').innerHTML = 'Please login first in index.html with <b>baracyriaque@gmail.com</b>'; return; }
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if(!snap.exists() || snap.data().role !== "admin"){
+    document.getElementById('status').innerHTML = '❌ Not admin. Your UID: ' + user.uid;
+    return;
+  }
+  document.getElementById('status').innerHTML = '✅ Welcome Admin: ' + user.email;
+  const users = await getDocs(collection(db, "users"));
+  let html = "";
+  users.forEach(u => {
+    const d = u.data();
+    html += `<div class="user"><b>${d.email || d.name || u.id}</b><br>Role: ${d.role || 'student'}<br>
+    <select onchange="changeRole('${u.id}', this.value)">
+    <option value="student" ${d.role=='student'?'selected':''}>student</option>
+    <option value="teacher" ${d.role=='teacher'?'selected':''}>teacher</option>
+    <option value="admin" ${d.role=='admin'?'selected':''}>admin</option>
+    </select></div>`;
+  });
+  document.getElementById('list').innerHTML = html;
+});
+
+window.changeRole = async (uid, role) => {
+  await updateDoc(doc(db, "users", uid), { role: role });
+  alert("Changed to " + role);
+};
+</script>
+</body>
+</html>
