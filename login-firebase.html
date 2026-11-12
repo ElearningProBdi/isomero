@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head><title>ISOMERO - Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:sans-serif;background:#F5F5F5;margin:0;padding:15px}
+.card{background:white;padding:25px;border-radius:12px;max-width:400px;margin:30px auto;box-shadow:0 4px 20px rgba(0,0,0,.1);text-align:center}
+input{width:100%;padding:12px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box;margin:6px 0}
+button{width:100%;padding:12px;background:#FF6B00;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:10px;font-weight:bold}
+/* SCROLLABLE ROLES */
+.role-scroll{display:flex;gap:10px;overflow-x:auto;padding:10px 2px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;margin:10px 0}
+.role-scroll::-webkit-scrollbar{height:6px}
+.role-scroll::-webkit-scrollbar-thumb{background:#FF6B00;border-radius:10px}
+.role-card{min-width:105px;padding:12px 8px;text-align:center;border:2px solid #eee;border-radius:12px;cursor:pointer;scroll-snap-align:start;background:white;flex-shrink:0;font-size:13px}
+.role-card.selected{border-color:#FF6B00;background:#FFF3E6;transform:scale(1.03)}
+.role-card small{display:block;color:#888;font-size:11px;margin-top:3px}
+</style>
+</head>
+<body>
+<div class="card">
+<div style="text-align:center;margin-bottom:15px">
+  <div style="font-size:60px;line-height:1">🎓</div>
+  <h1 style="margin:5px 0 0 0;font-size:36px;letter-spacing:3px;color:#111">ISOMERO</h1>
+  <p style="margin:0;font-size:11px;letter-spacing:4px;color:#FF6B00;font-weight:bold">E-LEARNING PLATFORM</p>
+  <div style="width:60px;height:4px;background:#FF6B00;margin:12px auto;border-radius:2px"></div>
+  <p style="color:#666;font-size:14px">Apprends. Enseigne. Vends.</p>
+</div>
+
+<p style="text-align:left;font-size:13px;font-weight:bold;margin:10px 0 0">Choose your role 👉 swipe</p>
+<div class="role-scroll" id="roleScroll">
+  <div class="role-card" data-role="student" onclick="selectRole(this)">🎓<br><b>STUDENT</b><small>VIEW</small></div>
+  <div class="role-card" data-role="teacher" onclick="selectRole(this)">👩‍🏫<br><b>TEACHER</b><small>CREATE+EDIT</small></div>
+  <div class="role-card" data-role="leader" onclick="selectRole(this)">💰<br><b>LEADER</b><small>SELL ONLY</small></div>
+  <div class="role-card" data-role="admin" onclick="selectRole(this)">👨‍💼<br><b>ADMIN</b><small>ALL</small></div>
+</div>
+
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login →</button>
+<p id="msg" style="font-size:13px;color:red"></p>
+<p style="font-size:12px;color:#888">Demo: super_admin = baracyriaque@gmail.com</p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script>
+// === YOUR REAL FIREBASE KEYS - ISOMERO ===
+const firebaseConfig = {
+  apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3tEX60jk",
+  authDomain: "isomero-f6887.firebaseapp.com",
+  projectId: "isomero-f6887",
+  storageBucket: "isomero-f6887.firebasestorage.app",
+  messagingSenderId: "669743420568",
+  appId: "1:669743420568:web:3b478914e4cd1525cd2ced",
+  measurementId: "G-0QJZTRLQPG"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+const SUPER_EMAIL = "baracyriaque@gmail.com";
+let selectedRole = "student";
+function selectRole(el){
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRole = el.dataset.role;
+}
+document.querySelector('[data-role="student"]').classList.add('selected');
+
+async function login(){
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const pass = document.getElementById("password").value;
+  if(!email || !pass) return document.getElementById("msg").innerText = "Enter email + password";
+  let role = selectedRole;
+  let licences = 0;
+  if(email === SUPER_EMAIL){ role = "super_admin"; licences = 999; }
+  try{
+    let cred;
+    try{ cred = await auth.signInWithEmailAndPassword(email, pass); }
+    catch(e){ cred = await auth.createUserWithEmailAndPassword(email, pass); }
+    const uid = cred.user.uid;
+    const doc = await db.collection("users").doc(uid).get();
+    if(doc.exists && doc.data().role && email !== SUPER_EMAIL){
+      role = doc.data().role;
+    } else {
+      await db.collection("users").doc(uid).set({
+        email: email,
+        role: role,
+        licences: licences,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+    }
+    localStorage.setItem("isomero_current", JSON.stringify({email:email, role:role, licences:licences, uid:uid}));
+    window.location.href = "dashboard.html";
+  }catch(err){
+    document.getElementById("msg").innerText = err.message;
+  }
+}
+</script>
+</body>
+</html>
