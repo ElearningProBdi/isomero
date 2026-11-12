@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISOMERO - Universal Player + Scoring</title>
+<style>
+  *{box-sizing:border-box} body{margin:0;font-family:Arial;background:#0f172a;color:white}
+  .top{padding:12px;background:#1e293b;display:flex;gap:8px;flex-wrap:wrap}
+  input,select,button,textarea{padding:11px;border-radius:8px;border:none;font-size:15px}
+  input,textarea{flex:1;min-width:150px} select{background:white} button{background:#22c55e;color:white;font-weight:bold;cursor:pointer}
+  button.blue{background:#3b82f6} button.orange{background:#f59e0b} button.purple{background:#8b5cf6} button.gray{background:#334155} button.red{background:#ef4444}
+  .wrap{max-width:950px;margin:auto;padding:12px}
+  #playerBox{background:#000;border-radius:12px;overflow:hidden;min-height:420px;display:flex;align-items:center;justify-content:center}
+  #playerBox iframe{width:100%;height:520px;border:none;background:white}
+  #playerBox video,#playerBox audio{width:100%} #playerBox img{max-width:100%;max-height:520px}
+  .card{background:#1e293b;padding:14px;border-radius:12px;margin-top:12px}
+  .quiz-opt{display:block;width:100%;text-align:left;margin:7px 0;background:#334155;color:white;padding:13px;border-radius:8px;cursor:pointer;font-size:16px}
+  .quiz-opt.correct{background:#22c55e} .quiz-opt.wrong{background:#ef4444}
+  #status{font-size:13px;color:#94a3b8;margin-top:8px}
+  .scoreBig{font-size:32px;color:#22c55e;font-weight:bold}
+  .tabs{display:flex;gap:8px;margin:12px 0} .tabs button{flex:1} .tabs button.active{background:#22c55e}
+  textarea{width:100%;background:#0f172a;color:white;border:1px solid #334155}
+  .bar{height:12px;background:#334155;border-radius:6px;overflow:hidden;margin:8px 0} .barFill{height:100%;background:#22c55e;width:0%;transition:0.3s}
+  .badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:bold} .pass{background:#22c55e} .fail{background:#ef4444} .pending{background:#f59e0b}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <b>🎓 ISOMERO</b>
+  <input id="studentName" placeholder="Student Name: Jean">
+  <input id="courseName" placeholder="Course: Math">
+  <span id="timerBadge" class="badge pending">⏱ 00:00</span>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button id="tabPlay" class="active" onclick="showTab('play')">▶️ Play</button>
+    <button id="tabQuiz" onclick="showTab('quiz')">📝 Quiz</button>
+    <button id="tabCreate" onclick="showTab('create')">✏️ Create Quiz</button>
+    <button id="tabScore" onclick="showTab('score')">🏆 My Scores</button>
+  </div>
+
+  <!-- PLAY -->
+  <div id="viewPlay">
+    <div class="top" style="border-radius:12px">
+      <select id="activityType">
+        <option value="auto">🔍 Auto Detect</option>
+        <option value="youtube">▶️ YouTube / Vimeo</option>
+        <option value="video">🎬 Video MP4</option>
+        <option value="audio">🎧 Audio MP3</option>
+        <option value="h5p">🎮 H5P</option>
+        <option value="pdf">📄 PDF</option>
+        <option value="image">🖼️ Image</option>
+        <option value="website">🌐 Website / Game</option>
+        <option value="text">📖 Text</option>
+      </select>
+      <input id="contentUrl" placeholder="Paste Link Here">
+      <button class="blue" onclick="loadContent()">▶ Play</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="viewQuiz" style="display:none">
+    <div class="top" style="border-radius:12px">
+      <input id="quizUrl" placeholder="Paste H5P / Google Form Quiz URL OR Leave Empty for Built-in">
+      <button class="purple" onclick="loadQuizUrl()">▶ Load Quiz Link</button>
+      <button onclick="startBuiltInQuiz()">📝 Start Quiz</button>
+    </div>
+  </div>
+
+  <!-- CREATE -->
+  <div id="viewCreate" style="display:none">
+    <div class="card">
+      <h3>✏️ Create Quiz (Teacher)</h3>
+      <p style="color:#94a3b8;font-size:13px">Format: Question | Correct | Wrong1 | Wrong2 | Wrong3 - One per line. Each question = 100 / total questions points</p>
+      <textarea id="quizInput" rows="7" placeholder="What is 2+2? | 4 | 3 | 5 | 6
+Capital of Burundi? | Bujumbura | Kigali | Nairobi | Dodoma"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px"><button onclick="saveCustomQuiz()">💾 Save Quiz & Start</button><button class="gray" onclick="loadSampleQuiz()">Load Sample</button></div>
+    </div>
+  </div>
+
+  <!-- SCORES -->
+  <div id="viewScore" style="display:none">
+    <div class="card"><h3>🏆 My Scores - Live from Firebase</h3><div id="scoreList">Click Refresh to load</div><button class="blue" onclick="loadMyScores()" style="margin-top:10px">🔄 Refresh Scores</button></div>
+  </div>
+
+  <div id="playerBox" style="margin-top:12px"><p style="color:#94a3b8;padding:20px;text-align:center">👆 Play Activity OR Take Quiz<br>Scoring is Automatic for Quiz, Manual + Time + Completion for Others</p></div>
+
+  <!-- SCORING PANEL - INSERTED -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div>📊 <b>SCORING</b> | Activity: <span id="actLabel">-</span> | <span id="quizProgress">-</span></div>
+      <div><span id="passBadge" class="badge pending">NOT STARTED</span></div>
+    </div>
+    <div class="bar"><div id="progressBar" class="barFill"></div></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+      <div>Score: <span class="scoreBig" id="scoreDisplay">0</span>/100</div>
+      <div>✔ Correct: <b id="correctCount">0</b></div>
+      <div>✘ Wrong: <b id="wrongCount">0</b></div>
+      <div>⏱ Time: <b id="timeSpent">0s</b></div>
+      <div>🔁 Attempt: <b id="attemptCount">1</b></div>
+      <div>🏅 Points: <b id="pointsDisplay">0</b></div>
+    </div>
+    <!-- For Video / H5P / PDF etc - Teacher / Self Assessment -->
+    <div id="manualScoreBox" style="margin-top:12px">
+      <p style="color:#94a3b8;font-size:13px;margin:4px 0">For Video / H5P / PDF / Reading: Did you complete it? Rate your understanding:</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="gray" onclick="setManualScore(100)">😍 100% - Fully Understood</button>
+        <button class="gray" onclick="setManualScore(80)">🙂 80% - Mostly</button>
+        <button class="gray" onclick="setManualScore(60)">😐 60% - Partly</button>
+        <button class="gray" onclick="setManualScore(40)">😕 40% - Little</button>
+        <button class="gray" onclick="setManualScore(0)">😞 0% - Not Understood</button>
+      </div>
+      <p style="color:#94a3b8;font-size:12px">OR enter exact score:</p>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <input id="scoreInput" type="number" min="0" max="100" placeholder="Final Score 0-100" style="flex:1">
+      <button onclick="finishCourse()">✅ Finish & Save Score</button>
+      <button class="orange" onclick="getCertificate()">🎓 Certificate</button>
+      <button class="red" onclick="resetScoring()">🔄 Reset</button>
+    </div>
+    <div id="status">Firebase Connected ✅</div>
+    <div id="scoringExplain" style="font-size:12px;color:#94a3b8;margin-top:6px"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3tEX60jk",
+  authDomain: "isomero-f6887.firebaseapp.com",
+  projectId: "isomero-f6887",
+  storageBucket: "isomero-f6887.firebasestorage.app",
+  messagingSenderId: "669743420568",
+  appId: "1:669743420568:web:3b478914e4cd1525cd2ced",
+  measurementId: "G-0QJZTRLQPG"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ===== SCORING ENGINE - INSERTED =====
+let currentUrl="", lastScore=0, customQuiz=[], quizIndex=0, quizScore=0, wrongCount=0, startTime=Date.now(), elapsed=0, attempt=1, points=0, timerInterval=null, activityStarted=false;
+const PASS_MARK = 50;
+function startTimer(){
+  if(timerInterval) clearInterval(timerInterval);
+  startTime=Date.now(); activityStarted=true;
+  timerInterval=setInterval(()=>{
+    elapsed=Math.floor((Date.now()-startTime)/1000);
+    const m=String(Math.floor(elapsed/60)).padStart(2,'0'), s=String(elapsed%60).padStart(2,'0');
+    document.getElementById('timerBadge').innerText=`⏱ ${m}:${s}`;
+    document.getElementById('timeSpent').innerText=elapsed+"s";
+  },1000);
+}
+function calculateScore(){
+  // QUIZ: Score = (Correct / Total) * 100
+  // VIDEO / OTHER: Score = Manual Score OR Completion Score
+  // POINTS: Score * 10 = Points (ex: 80% = 800 points)
+  // BONUS: +10 points if finished in < 5 min, -0 if > 10 min
+  let bonus = elapsed>0 && elapsed<300 ? 10 : 0;
+  points = (lastScore*10) + bonus;
+  document.getElementById('pointsDisplay').innerText=points;
+  document.getElementById('progressBar').style.width=lastScore+"%";
+  const badge=document.getElementById('passBadge');
+  if(lastScore>=PASS_MARK){ badge.innerText="✅ PASSED"; badge.className="badge pass"; }
+  else if(lastScore>0){ badge.innerText="❌ FAILED - Retry"; badge.className="badge fail"; }
+  else { badge.innerText="NOT STARTED"; badge.className="badge pending"; }
+  document.getElementById('scoringExplain').innerText=`Formula: Quiz = (Correct/Total)*100 | Points = Score x 10 + Time Bonus (${bonus}) | Pass Mark = ${PASS_MARK}% | Attempt ${attempt}`;
+}
+function updateQuizUI(){
+  document.getElementById('scoreDisplay').innerText=lastScore;
+  document.getElementById('scoreInput').value=lastScore;
+  document.getElementById('correctCount').innerText=quizScore;
+  document.getElementById('wrongCount').innerText=wrongCount;
+  calculateScore();
+}
+function setManualScore(v){
+  // For non-quiz activities
+  lastScore=v; quizScore= v>=50?1:0; wrongCount= v>=50?0:1;
+  updateQuizUI();
+  document.getElementById('status').innerText=`Manual Score Set: ${v}% - Click Finish & Save`;
+}
+function resetScoring(){
+  lastScore=0; quizScore=0; wrongCount=0; quizIndex=0; elapsed=0; attempt++; 
+  document.getElementById('attemptCount').innerText=attempt;
+  document.getElementById('scoreInput').value=""; updateQuizUI(); startTimer();
+  document.getElementById('status').innerText="Scoring Reset - Attempt "+attempt;
+}
+
+function showTab(t){
+  ['play','quiz','create','score'].forEach(k=>{
+    document.getElementById('view'+k.charAt(0).toUpperCase()+k.slice(1)).style.display = t===k?'block':'none';
+    document.getElementById('tab'+k.charAt(0).toUpperCase()+k.slice(1)).className = t===k?'active':'';
+  });
+  if(t==='score') loadMyScores();
+}
+
+// PLAY ALL
+function loadContent(){
+  const url=document.getElementById('contentUrl').value.trim(); currentUrl=url;
+  const box=document.getElementById('playerBox'); let type=document.getElementById('activityType').value;
+  if(type==='auto'){
+    if(url.includes("youtube")||url.includes("youtu.be")) type='youtube';
+    else if(url.endsWith(".mp3")) type='audio';
+    else if(url.endsWith(".mp4")) type='video';
+    else if(url.endsWith(".pdf")) type='pdf';
+    else if(url.match(/\.(jpg|png|gif|webp)$/i)) type='image';
+    else type='website';
+  }
+  document.getElementById('actLabel').innerText=type.toUpperCase(); startTimer();
+  if(type==='youtube'){ let id=url.includes("v=")?url.split("v=")[1].split("&")[0]:url.split("/").pop(); box.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe>`; }
+  else if(type==='video'){ box.innerHTML=`<video src="${url}" controls autoplay style="height:520px"></video>`; }
+  else if(type==='audio'){ box.innerHTML=`<div style="padding:30px;width:100%;text-align:center"><h2>🎧 Listen</h2><audio src="${url}" controls autoplay></audio><p>Listen fully, then rate your understanding below</p></div>`; }
+  else if(type==='pdf'){ box.innerHTML=`<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true"></iframe>`; }
+  else if(type==='image'){ box.innerHTML=`<img src="${url}">`; }
+  else if(type==='text'){ box.innerHTML=`<div style="background:white;color:black;padding:24px;text-align:left;width:100%;height:520px;overflow:auto"><h2>📖 Reading</h2><p>Read carefully, then rate your understanding below.</p><textarea placeholder="Your notes..." style="width:100%;height:150px;padding:10px;color:black;background:#f1f5f9"></textarea></div>`; }
+  else { box.innerHTML=`<iframe src="${url}" allowfullscreen allow="autoplay; fullscreen"></iframe>`; }
+  document.getElementById('status').innerText="Playing: "+type+" - Timer Started - Scoring Active";
+}
+
+// QUIZ
+function loadSampleQuiz(){ document.getElementById('quizInput').value="What is 2+2? | 4 | 3 | 5 | 6\nCapital of Burundi? | Bujumbura | Kigali | Nairobi | Dodoma\nWhat is H2O? | Water | Salt | Fire | Air"; }
+function saveCustomQuiz(){
+  const txt=document.getElementById('quizInput').value.trim(); if(!txt) return alert("Write quiz first!");
+  customQuiz=txt.split("\n").map(line=>{ const p=line.split("|").map(s=>s.trim()); const opts=[p[1
