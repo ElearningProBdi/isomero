@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head><title>ISOMERO Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>body{font-family:sans-serif;background:#f5f5f5;margin:0;padding:15px}.card{background:white;padding:20px;border-radius:12px;max-width:600px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,.1)}button{padding:10px 15px;border:none;border-radius:8px;cursor:pointer;margin:5px 5px 5px 0}input,textarea,select{width:100%;padding:12px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box;margin:6px 0}textarea{height:80px}.course{border:1px solid #ddd;padding:12px;border-radius:8px;margin:8px 0}.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;z-index:99}.modal>div{background:white;padding:20px;border-radius:12px;width:90%;max-width:450px;max-height:90vh;overflow-y:auto}.tab{padding:10px 15px;border-radius:8px;cursor:pointer;border:2px solid #ddd;background:#fff}.tab.active{background:#000;color:#fff;border-color:#000}</style>
+</head>
+<body>
+<div class="card">
+
+<!-- LOGO ISOMERO START -->
+<div style="text-align:center;margin-bottom:15px">
+  <div style="font-size:50px;line-height:1">🎓</div>
+  <h1 style="margin:5px 0 0 0;font-size:32px;letter-spacing:3px;color:#111">ISOMERO</h1>
+  <p style="margin:0;font-size:11px;letter-spacing:4px;color:#FF6B00;font-weight:bold">E-LEARNING PLATFORM</p>
+  <div style="width:60px;height:4px;background:#FF6B00;margin:10px auto;border-radius:2px"></div>
+</div>
+<!-- LOGO ISOMERO END -->
+
+<p id="info"></p>
+<div id="adminZone" style="display:none">
+  <button onclick="window.location.href='manage-users.html'" style="background:#000;color:#fff;width:100%;padding:14px;font-size:16px;font-weight:bold">👥 Manage Users</button>
+</div>
+<div id="actions"></div>
+<h3>Courses</h3>
+<div id="courses"></div>
+<button onclick="logout()" style="background:#eee;width:100%;margin-top:15px">Logout</button>
+</div>
+
+<div id="createModal" class="modal"><div>
+<h2>+ Create Course</h2>
+<div style="display:flex;gap:8px">
+  <div id="tabManual" class="tab active" onclick="switchTab('manual')">✍️ Create by Click</div>
+  <div id="tabScorm" class="tab" onclick="switchTab('scorm')">📦 Add SCORM</div>
+</div>
+<div id="formManual">
+  <input id="mTitle" placeholder="Course Title ex: Math Chapitre 1">
+  <textarea id="mDesc" placeholder="Description / Content..."></textarea>
+  <input id="mPrice" type="number" placeholder="Price (ex: 20000)">
+  <button onclick="createManual()" style="background:#FF6B00;color:#fff;width:100%">Create Course</button>
+</div>
+<div id="formScorm" style="display:none">
+  <input id="sTitle" placeholder="Course Title (auto from file if empty)">
+  <input id="sPrice" type="number" placeholder="Price (ex: 20000)">
+  <p style="font-size:13px">Upload SCORM .zip file:</p>
+  <input id="sFile" type="file" accept=".zip">
+  <p id="scormInfo" style="font-size:12px;color:green"></p>
+  <button onclick="createScorm()" style="background:green;color:#fff;width:100%">Upload SCORM & Create</button>
+</div>
+<button onclick="closeModal()" style="background:#eee;width:100%">Cancel</button>
+</div></div>
+
+<div id="viewModal" class="modal"><div>
+<h2 id="vTitle"></h2>
+<p id="vDesc"></p>
+<div id="vContent"></div>
+<button onclick="closeView()" style="background:#000;color:#fff;width:100%">Close</button>
+</div></div>
+
+<script>
+const PERMISSIONS = {
+  student: { canCreate:false, canEdit:false, canDelete:false, canSell:false },
+  teacher: { canCreate:true, canEdit:true, canDelete:false, canSell:false },
+  leader: { canCreate:true, canEdit:true, canDelete:false, canSell:true },
+  admin: { canCreate:true, canEdit:true, canDelete:true, canSell:true },
+  super_admin: { canCreate:true, canEdit:true, canDelete:true, canSell:true },
+};
+const MIN_LICENCES = 10;
+const user = JSON.parse(localStorage.getItem("isomero_current") || "null");
+if(!user) window.location.href="login-firebase.html";
+const perm = PERMISSIONS[user.role] || PERMISSIONS.student;
+document.getElementById("info").innerText = user.email + " | Role: " + user.role + " | Licences: " + (user.licences||0);
+if(user.role==='super_admin'||user.role==='admin') document.getElementById("adminZone").style.display="block";
+function getCourses(){
+  let c = JSON.parse(localStorage.getItem("isomero_courses") || "null");
+  if(!c){
+    c = [
+      {id:'c1',title:'Français A1', desc:'Grammaire de base', price:20000, type:'manual', ownerId:user.email, ownerEmail:user.email},
+      {id:'c2',title:'English Business', desc:'Business English', price:25000, type:'manual', ownerId:'other@email.com', ownerEmail:'other@email.com'}
+    ];
+    localStorage.setItem("isomero_courses", JSON.stringify(c));
+  }
+  return c;
+}
+function saveCourses(c){ localStorage.setItem("isomero_courses", JSON.stringify(c)); renderCourses(); }
+function canEdit(course){
+  if(!perm.canEdit) return false;
+  if(user.role==='admin'||user.role==='super_admin') return true;
+  if(user.role==='teacher'||user.role==='leader'){
+    if((user.licences||0)<MIN_LICENCES) return false;
+    return course.ownerId===user.uid || course.ownerId===user.email || course.ownerEmail===user.email;
+  }
+  return false;
+}
+function canCreate(){
+  if(!perm.canCreate) return false;
+  if(user.role==='admin'||user.role==='super_admin') return true;
+  return (user.licences||0)>=MIN_LICENCES;
+}
+function renderCourses(){
+  const COURSES = getCourses();
+  let html = "";
+  if(canCreate()) html = '<button onclick="openModal()" style="background:#FF6B00;color:#fff;padding:12px;width:100%">+ Create Course</button>';
+  document.getElementById("actions").innerHTML = html;
+  let cHtml = "";
+  COURSES.forEach(c=>{
+    cHtml += `<div class="course"><b>${c.title}</b> ${c.type==='scorm'?'📦 SCORM':''}<br><small>${c.desc||''} | ${c.price||0} FBu | by ${c.ownerEmail||''}</small><br>
+    <button onclick="viewCourse('${c.id}')">VIEW</button>
+    ${canEdit(c)?`<button onclick="editCourse('${c.id}')">EDIT</button>`:''}
+    ${perm.canSell?`<button style="background:green;color:#fff" onclick="alert('Sell link: isomero.com/course/${c.id}')">SELL</button>`:''}
+    ${perm.canDelete?`<button style="background:red;color:#fff" onclick="deleteCourse('${c.id}')">DELETE</button>`:''}
+    ${c.type==='scorm'?`<button style="background:#000;color:#fff" onclick="launchScorm('${c.id}')">▶ LAUNCH SCORM</button>`:''}
+    </div>`;
+  });
+  document.getElementById("courses").innerHTML = cHtml || "No courses yet";
+}
+function switchTab(t){
+  document.getElementById("tabManual").className = t==='manual'?'tab active':'tab';
+  document.getElementById("tabScorm").className = t==='scorm'?'tab active':'tab';
+  document.getElementById("formManual").style.display = t==='manual'?'block':'none';
+  document.getElementById("formScorm").style.display = t==='scorm'?'block':'none';
+}
+function openModal(){ document.getElementById("createModal").style.display="flex"; }
+function closeModal(){ document.getElementById("createModal").style.display="none"; }
+function closeView(){ document.getElementById("viewModal").style.display="none"; }
+function createManual(){
+  const title = document.getElementById("mTitle").value.trim();
+  const desc = document.getElementById("mDesc").value.trim();
+  const price = document.getElementById("mPrice").value||0;
+  if(!title) return alert("Enter title");
+  const c = getCourses();
+  c.push({id:'c'+Date.now(), title:title, desc:desc, price:price, type:'manual', ownerId:user.uid||user.email, ownerEmail:user.email});
+  saveCourses(c); closeModal();
+  document.getElementById("mTitle").value=""; document.getElementById("mDesc").value="";
+  alert("Course created! ✅");
+}
+document.getElementById("sFile").addEventListener("change", async function(){
+  const f = this.files[0]; if(!f) return;
+  try{
+    const zip = await JSZip.loadAsync(f);
+    const hasManifest = !!zip.file(/imsmanifest\.xml/);
+    const files = Object.keys(zip.files).length;
+    document.getElementById("scormInfo").innerText = hasManifest ? `✅ Valid SCORM detected! ${files} files` : `⚠️ No imsmanifest.xml found`;
+    if(!document.getElementById("sTitle").value) document.getElementById("sTitle").value = f.name.replace(".zip","");
+  }catch(e){ document.getElementById("scormInfo").innerText = "Error: "+e.message; }
+});
+async function createScorm(){
+  const fileInput = document.getElementById("sFile");
+  const f = fileInput.files[0];
+  if(!f) return alert("Choose a .zip SCORM file first");
+  const title = document.getElementById("sTitle").value.trim() || f.name.replace(".zip","");
+  const price = document.getElementById("sPrice").value||0;
+  const reader = new FileReader();
+  reader.onload = function(){
+    const c = getCourses();
+    c.push({id:'scorm'+Date.now(), title:title, desc:'SCORM Package: '+f.name, price:price, type:'scorm', fileName:f.name, fileData:reader.result, ownerId:user.uid||user.email, ownerEmail:user.email});
+    saveCourses(c); closeModal(); fileInput.value="";
+    alert("SCORM uploaded! 📦✅");
+  };
+  reader.readAsDataURL(f);
+}
+function viewCourse(id){
+  const c = getCourses().find(x=>x.id===id);
+  document.getElementById("vTitle").innerText = c.title + (c.type==='scorm'?' 📦 SCORM':'');
+  document.getElementById("vDesc").innerText = c.desc + " | Price: " + c.price + " FBu";
+  document.getElementById("vContent").innerHTML = c.type==='scorm' ? `<p>File: ${c.fileName}</p><button onclick="launchScorm('${c.id}')" style="background:#000;color:#fff">▶ Launch SCORM</button>` : `<p>${c.desc}</p>`;
+  document.getElementById("viewModal").style.display="flex";
+}
+async function launchScorm(id){
+  const c = getCourses().find(x=>x.id===id);
+  if(!c.fileData) return alert("No SCORM file stored");
+  const base64 = c.fileData.split(",")[1];
+  const zip = await JSZip.loadAsync(base64, {base64:true});
+  const files = Object.keys(zip.files);
+  let start = files.find(f=>f.toLowerCase().endsWith("index.html")) || files.find(f=>f.toLowerCase().includes("story.html")) || files[0];
+  const blob = await zip.file(start).async("blob");
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+function editCourse(id){
+  const c = getCourses().find(x=>x.id===id);
+  const newTitle = prompt("Edit Title:", c.title);
+  if(newTitle){ c.title=newTitle; saveCourses(getCourses()); }
+}
+function deleteCourse(id){
+  if(!confirm("Delete this course?")) return;
+  let c = getCourses().filter(x=>x.id!==id);
+  saveCourses(c);
+}
+function logout(){ localStorage.removeItem("isomero_current"); window.location.href="login-firebase.html"; }
+renderCourses();
+</script>
+</body>
+</html>
