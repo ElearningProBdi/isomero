@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head><title>ISOMERO - Manage Users</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:sans-serif;background:#f5f5f5;margin:0;padding:15px}
+.card{background:white;padding:15px;border-radius:12px;max-width:500px;margin:0 auto}
+.user{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eee;gap:10px}
+.user b{font-size:14px;display:block;word-break:break-all}
+.user small{color:#888}
+select{padding:10px;border-radius:8px;border:2px solid #ddd;font-size:15px;font-weight:bold;min-width:110px;cursor:pointer}
+select[data-role="super_admin"]{border-color:#000;background:#000;color:#fff}
+select[data-role="admin"]{border-color:red;color:red}
+select[data-role="teacher"]{border-color:#FF6B00;color:#FF6B00}
+select[data-role="leader"]{border-color:green;color:green}
+select[data-role="student"]{border-color:#999;color:#666}
+input{width:100%;padding:12px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box;margin:5px 0}
+button{width:100%;padding:12px;background:#000;color:#fff;border:none;border-radius:8px;margin-top:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>👥 Manage Users</h2>
+<p id="me"></p>
+
+<h3>Add User</h3>
+<input id="newEmail" placeholder="Email ex: jean@test.com">
+<input id="newLicences" type="number" placeholder="Licences (ex: 12)" value="0">
+<button onclick="addUser()" style="background:#FF6B00">+ Add User</button>
+
+<h3>All Users - Scroll & Click Role to Change 👇</h3>
+<div id="list" style="max-height:400px;overflow-y:auto"></div>
+<button onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+</div>
+
+<script>
+const me = JSON.parse(localStorage.getItem("isomero_current") || "null");
+if(!me || (me.role!=="super_admin" && me.role!=="admin")){ alert("Only Admin / Super Admin"); window.location.href="login-firebase.html"; }
+document.getElementById("me").innerText = "You: " + me.email + " (" + me.role + ")";
+
+const SUPER_EMAIL = "baracyriaque@gmail.com";
+const ROLES = ["student","teacher","leader","admin"];
+
+function getUsers(){
+  let users = JSON.parse(localStorage.getItem("isomero_users") || "[]");
+  // Always ensure super_admin exists
+  if(!users.find(u=>u.email.toLowerCase()===SUPER_EMAIL)){
+    users.unshift({email:SUPER_EMAIL, role:"super_admin", licences:999});
+    localStorage.setItem("isomero_users", JSON.stringify(users));
+  }
+  return users;
+}
+
+function render(){
+  const users = getUsers();
+  let html = "";
+  users.forEach((u,i)=>{
+    const isSuper = u.email.toLowerCase()===SUPER_EMAIL;
+    html += `<div class="user">
+      <div><b>${u.email}</b><small>Licences: ${u.licences||0}</small></div>
+      ${isSuper 
+        ? `<select disabled data-role="super_admin"><option>super_admin 🔒</option></select>`
+        : `<select data-role="${u.role}" onchange="changeRole(${i}, this.value)">
+             ${ROLES.map(r=>`<option value="${r}" ${r===u.role?'selected':''}>${r}</option>`).join('')}
+           </select>`
+      }
+    </div>`;
+  });
+  document.getElementById("list").innerHTML = html || "<p>No users yet</p>";
+}
+
+function changeRole(index, newRole){
+  const users = getUsers();
+  users[index].role = newRole;
+  localStorage.setItem("isomero_users", JSON.stringify(users));
+  alert(users[index].email + " → now " + newRole);
+  render();
+}
+
+function addUser(){
+  const email = document.getElementById("newEmail").value.trim().toLowerCase();
+  const licences = parseInt(document.getElementById("newLicences").value||0);
+  if(!email) return alert("Enter email");
+  const users = getUsers();
+  if(users.find(u=>u.email.toLowerCase()===email)) return alert("Already exists");
+  users.push({email:email, role:"student", licences:licences});
+  localStorage.setItem("isomero_users", JSON.stringify(users));
+  document.getElementById("newEmail").value="";
+  render();
+}
+render();
+</script>
+</body>
+</html>
