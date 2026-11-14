@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ISOMERO - Manage Users</title><style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#0a0e1f;color:#fff;padding:0}
+.top{max-width:720px;margin:auto;padding:14px 12px}
+.header{display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:11px;padding:5px 10px;border-radius:99px;font-weight:800;display:inline-block}.ok{background:#00ff88;color:#000}.lock{background:#ff2a5a;color:#fff}.warn{background:#ffcc00;color:#000}.grey{background:#475569;color:#fff}
+.card{background:#131a36;border:1px solid #1e2540;border-radius:16px;padding:14px;margin:12px 0}
+.user{background:#fff;color:#111;border-radius:16px;padding:14px;margin:10px 0}
+.user b{font-size:15px}.user small{color:#64748b}
+button{border:none;border-radius:10px;font-weight:800;cursor:pointer;padding:10px 12px;font-size:13px;margin:3px 2px}
+.btn-gold{background:#ffcc00;color:#000}.btn-dark{background:#111;color:#fff}.btn-green{background:#00ff88;color:#000}.btn-red{background:#ff2a5a;color:#fff}.btn-grey{background:#e2e8f0;color:#111}
+input,select{background:#0f1326;color:#fff;border:1px solid #1e2540;padding:11px;border-radius:12px;width:100%;margin:5px 0}
+.stats{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+</style></head><body>
+
+<!-- 🔐 ADMIN LOGIN - FIREBASE AUTH -->
+<div id="adminLock" style="position:fixed;inset:0;background:#0a0e1f;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;color:#111;border-radius:16px;padding:28px;width:100%;max-width:380px;text-align:center;">
+    <div style="font-size:40px;">🔐</div>
+    <h2 style="margin:10px 0 5px;">ISOMERO Admin</h2>
+    <p style="color:#64748b;margin:0 0 16px;font-size:13px;">Login with Firebase Admin account</p>
+    <input id="adminEmail" type="email" placeholder="Admin Email" value="baracyriaque@gmail.com" style="background:#fff;color:#111;border:1px solid #e2e8f0;">
+    <input id="adminPass" type="password" placeholder="Admin Password" style="background:#fff;color:#111;border:1px solid #e2e8f0;">
+    <button onclick="loginAdmin()" style="width:100%;margin-top:12px;padding:14px;background:#2563eb;color:white;font-size:16px;">Login as Admin</button>
+    <p id="adminError" style="color:#ef4444;display:none;margin-top:10px;font-size:13px;"></p>
+    <p style="margin-top:14px;"><a href="index.html" style="color:#2563eb;">← Back to Home</a></p>
+  </div>
+</div>
+
+<div class="top">
+<div class="header"><b>🎓 ISOMERO - MANAGE USERS</b><span id="fbStatus" style="font-size:11px;color:#ffcc00">⏳ Connecting...</span></div>
+<p style="color:#cbd5e1;font-size:13px"><a href="app.html" style="color:#ffcc00">← app.html</a> • <a href="index.html" style="color:#94a3b8">Home</a> • <button class="btn-red" onclick="logoutAdmin()" style="padding:6px 10px;">🚪 Logout</button></p>
+
+<div class="card" style="border-color:#ffcc00;background:#1a1600"><b>🔐 Generate New Key</b><input id="genStudent" placeholder="Student Full Name"><select id="genCourse"><option>General English</option><option>Legal English</option><option>Business English</option><option>Medical English</option></select><div style="display:flex;gap:6px"><input type="date" id="genStart" style="flex:1"><input type="date" id="genEnd" style="flex:1"></div><select id="genDuration"><option value="">-- OR Duration --</option><option value="7">7 Days</option><option value="30" selected>30 Days</option><option value="60">60 Days</option><option value="90">90 Days</option><option value="180">180 Days</option></select><button class="btn-gold" onclick="generateKey()">🔑 Generate Key</button><div id="generatedKey"></div></div>
+
+<div style="display:flex;gap:6px"><input id="searchInput" placeholder="🔍 Search Name / Key / Course..." oninput="renderList()" style="flex:2"><select id="filterCourse" onchange="renderList()" style="flex:1"><option value="">All Courses</option><option>General English</option><option>Legal English</option><option>Business English</option><option>Medical English</option></select></div>
+<select id="filterStatus" onchange="renderList()"><option value="">All Status</option><option value="active">✅ Active</option><option value="expired">⏰ Expired</option><option value="notused">🕐 Not Used Yet</option><option value="revoked">🚫 Revoked</option></select>
+<button class="btn-dark" onclick="loadUsers()">🔄 Refresh List</button>
+<div id="stats" class="stats"></div>
+<div id="list"></div>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const firebaseConfig = { apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3tEX60jk", authDomain: "isomero-f6887.firebaseapp.com", projectId: "isomero-f6887", storageBucket: "isomero-f6887.appspot.com", messagingSenderId: "109876543210", appId: "1:109876543210:web:isomero123456" };
+const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
+document.getElementById('fbStatus').innerText = "✅ " + firebaseConfig.projectId; document.getElementById('fbStatus').style.color="#00ff88";
+document.getElementById('genStart').value = new Date().toISOString().split('T')[0];
+
+window.loginAdmin = async function(){
+  const email = document.getElementById('adminEmail').value.trim();
+  const pass = document.getElementById('adminPass').value;
+  const errEl = document.getElementById('adminError');
+  errEl.style.display='none';
+  try{ await signInWithEmailAndPassword(auth, email, pass); }catch(e){ errEl.style.display='block'; errEl.textContent = e.message; }
+}
+window.logoutAdmin = async function(){ await signOut(auth); location.reload(); }
+document.getElementById('adminPass').addEventListener('keydown', e=>{ if(e.key==='Enter') window.loginAdmin(); });
+
+onAuthStateChanged(auth, (user)=>{
+  if(user){
+    document.getElementById('adminLock').style.display='none';
+    loadUsers();
+  } else {
+    document.getElementById('adminLock').style.display='flex';
+  }
+});
+
+function formatDate(ts){ if(!ts) return '-'; return new Date(ts).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+function daysLeft(exp){ if(!exp) return 999; return Math.ceil((exp - Date.now())/86400000); }
+let allKeys = [];
+window.loadUsers = async function(){ document.getElementById('list').innerHTML='<p>⏳ Loading...</p>'; try{ let snap=await getDocs(collection(db,'enrolmentKeys')); allKeys=[]; snap.forEach(d=>{ allKeys.push({key:d.id, ...d.data()}); }); allKeys.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)); renderList(); }catch(e){ document.getElementById('list').innerHTML='❌ '+e.message; } }
+window.renderList = function(){
+  let q=document.getElementById('searchInput').value.toLowerCase(); let fc=document.getElementById('filterCourse').value; let fs=document.getElementById('filterStatus').value;
+  let filtered=allKeys.filter(k=>{ if(fc && k.course!==fc) return false; if(q && !((k.studentName||'').toLowerCase().includes(q) || k.key.toLowerCase().includes(q) || (k.course||'').toLowerCase().includes(q))) return false; if(fs==='active' && !(k.used && !k.revoked && daysLeft(k.expiresAt)>=0)) return false; if(fs==='expired' && !(daysLeft(k.expiresAt)<0)) return false; if(fs==='notused' && k.used) return false; if(fs==='revoked' && !k.revoked) return false; return true; });
+  let active=allKeys.filter(k=>k.used && !k.revoked && daysLeft(k.expiresAt)>=0).length; let expired=allKeys.filter(k=>daysLeft(k.expiresAt)<0).length; let notused=allKeys.filter(k=>!k.used).length; let revoked=allKeys.filter(k=>k.revoked).length;
+  document.getElementById('stats').innerHTML=`<span class="badge ok">✅ Active: ${active}</span><span class="badge lock">⏰ Expired: ${expired}</span><span class="badge grey">🕐 Not Used: ${notused}</span><span class="badge lock">🚫 Revoked: ${revoked}</span><span class="badge" style="background:#fff;color:#000">👥 Total: ${allKeys.length}</span>`;
+  if(filtered.length===0){ document.getElementById('list').innerHTML='<div class="card">No users. Generate a key above.</div>'; return; }
+  let html='';
+  filtered.forEach(k=>{
+    let left=daysLeft(k.expiresAt); let status='';
+    if(k.revoked) status='<span class="badge lock">🚫 REVOKED</span>'; else if(!k.used) status='<span class="badge grey">🕐 NOT USED YET</span>'; else if(left<0) status='<span class="badge lock">⏰ EXPIRED</span>'; else if(left<=7) status='<span class="badge warn">⏳ '+left+' days left</span>'; else status='<span class="badge ok">✅ ACTIVE '+left+' days</span>';
+    html+=`<div class="user"><div style="display:flex;justify-content:space-between"><b>${k.studentName||'—'}</b>${status}</div><small>Created: ${formatDate(k.createdAt)} ${k.usedAt?`• Used: ${formatDate(k.usedAt)}`:''} • Device: ${k.deviceId||'-'}</small><br><b>${k.course}</b><br><span style="background:#ffcc00;padding:3px 8px;border-radius:8px;font-weight:800">${k.key}</span> <button class="btn-grey" onclick="navigator.clipboard.writeText('${k.key}');alert('Copied')">📋 Copy</button><br><small>📅 ${formatDate(k.startAt)} → ${formatDate(k.expiresAt)}</small><br><button class="btn-green" onclick="renewKey('${k.key}')">🔄 Renew +30d</button><button class="btn-gold" onclick="extendCustom('${k.key}')">📅 Extend</button>${k.revoked?`<button class="btn-dark" onclick="unrevokeKey('${k.key}')">✅ Un-Revoke</button>`:`<button class="btn-red" onclick="revokeKey('${k.key}')">🚫 Revoke</button>`}<button class="btn-red" style="background:#7f1d1d" onclick="deleteKey('${k.key}')">🗑️ Delete</button></div>`;
+  });
+  document.getElementById('list').innerHTML=html;
+}
+window.generateKey = async function(){
+  let course=document.getElementById('genCourse').value; let student=document.getElementById('genStudent').value.trim(); let startVal=document.getElementById('genStart').value; let endVal=document.getElementById('genEnd').value; let duration=document.getElementById('genDuration').value;
+  if(!student) return alert('Enter Student Name'); let startAt, expiresAt;
+  if(startVal && endVal){ startAt=new Date(startVal).getTime(); expiresAt=new Date(endVal).getTime()+86399999; } else if(duration){ startAt=Date.now(); expiresAt=Date.now()+parseInt(duration)*86400000; } else return alert('Set Period');
+  let prefix=course.split(' ')[0].toUpperCase(); let code=Math.random().toString(36).substring(2,7).toUpperCase(); let key=prefix+'-'+code;
+  try{ await setDoc(doc(db,'enrolmentKeys',key),{ course, studentName:student, used:false, deviceId:'', createdAt:Date.now(), startAt, expiresAt, durationDays: Math.ceil((expiresAt-startAt)/86400000) }); document.getElementById('generatedKey').innerHTML=`<div style="background:#00ff88;color:#000;padding:12px;border-radius:12px;font-weight:800;text-align:center">✅ ${student} - ${course}<br><span style="font-size:22px">${key}</span><br>📅 ${formatDate(startAt)} → ${formatDate(expiresAt)}<br><button style="background:#000;color:#fff" onclick="navigator.clipboard.writeText('${key}');alert('Copied')">📋 Copy</button> <a href="https://wa.me/?text=ISOMERO Key ${course}: ${key} - ${formatDate(startAt)} to ${formatDate(expiresAt)}" target="_blank"><button style="background:#25D366;color:#fff">💬 WhatsApp</button></a></div>`; loadUsers(); }catch(e){ alert(e.message); }
+}
+window.renewKey = async function(key){ if(!confirm('Renew '+key+' +30 days?')) return; try{ let snap=await getDoc(doc(db,'enrolmentKeys',key)); let d=snap.data(); let base=(d.expiresAt||0)>Date.now()?d.expiresAt:Date.now(); let newExp=base+30*86400000; await updateDoc(doc(db,'enrolmentKeys',key),{ expiresAt:newExp, renewedAt:Date.now(), revoked:false }); alert('✅ Renewed to '+formatDate(newExp)); loadUsers(); }catch(e){ alert(e.message); } }
+window.extendCustom = async function(key){ let d=prompt('How many days to add?'); if(!d) return; try{ let snap=await getDoc(doc(db,'enrolmentKeys',key)); let data=snap.data(); let base=(data.expiresAt||0)>Date.now()?data.expiresAt:Date.now(); let newExp=base+parseInt(d)*86400000; await updateDoc(doc(db,'enrolmentKeys',key),{ expiresAt:newExp, renewedAt:Date.now() }); alert('✅ Extended to '+formatDate(newExp)); loadUsers(); }catch(e){ alert(e.message); } }
+window.revokeKey = async function(key){ if(!confirm('🚫 REVOKE '+key+'? Student blocked instantly.')) return; try{ await updateDoc(doc(db,'enrolmentKeys',key),{ revoked:true, revokedAt:Date.now() }); alert('🚫 Revoked'); loadUsers(); }catch(e){ alert(e.message); } }
+window.unrevokeKey = async function(key){ try{ await updateDoc(doc(db,'enrolmentKeys',key),{ revoked:false }); alert('✅ Un-revoked'); loadUsers(); }catch(e){ alert(e.message); } }
+window.deleteKey = async function(key){ if(!confirm('🗑️ DELETE '+key+' forever?')) return; try{ await deleteDoc(doc(db,'enrolmentKeys',key)); alert('🗑️ Deleted'); loadUsers(); }catch(e){ alert(e.message); } }
+</script></body></html>
