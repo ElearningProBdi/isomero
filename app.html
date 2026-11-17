@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ISOMERO - Learn English in East Africa - Arusha</title><style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#0a0e1f;color:#fff}
+.top{max-width:560px;margin:auto;padding:16px 12px 8px;text-align:center}
+.badge{display:inline-block;background:#ffcc00;color:#000;font-size:11px;font-weight:800;padding:6px 12px;border-radius:99px}
+h1{font-size:32px;line-height:1.1;margin:12px 0 6px}h1 span{color:#ffcc00}
+.sub{color:#cbd5e1;font-size:15px;line-height:1.5;margin:0}
+.cta{position:sticky;bottom:0;background:#0a0e1f;padding:10px 12px;border-top:1px solid #1e2540;max-width:560px;margin:auto;z-index:10}
+button{border:none;border-radius:12px;font-weight:800;cursor:pointer;padding:15px;width:100%;font-size:16px}
+.btn-gold{background:#ffcc00;color:#000}.btn-wa{background:#25D366;color:#fff}
+.card{background:#131a36;border:1px solid #1e2540;border-radius:16px;padding:14px;margin:12px 0;text-align:left}
+.course{display:flex;gap:12px;background:#fff;color:#111;border-radius:14px;padding:14px;margin:10px 0;align-items:center;cursor:pointer}
+.course .icon{font-size:32px}.course b{font-size:16px}.course p{margin:4px 0 0;color:#64748b;font-size:13px;line-height:1.4}
+.pill{font-size:11px;background:#fef9c3;padding:4px 8px;border-radius:99px;font-weight:700}
+.step{display:flex;gap:12px;align-items:flex-start;margin:12px 0}.num{width:32px;height:32px;background:#ffcc00;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.small{font-size:12px;color:#94a3b8;text-align:center}
+a{color:inherit;text-decoration:none}
+input{background:#0f1326;color:#fff;border:1px solid #1e2540;padding:14px;border-radius:12px;width:100%;margin:8px 0;font-size:16px;text-align:center;text-transform:uppercase;font-weight:800;letter-spacing:1px}
+.locked{opacity:0.4;pointer-events:none}
+.unit{display:flex;gap:12px;background:#fff;color:#111;border-radius:14px;padding:14px;margin:10px 0;align-items:center;cursor:pointer}
+.unit b{font-size:15px}.unit p{margin:4px 0 0;color:#64748b;font-size:12px}
+.unum{width:42px;height:42px;background:#ffcc00;color:#000;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;font-size:13px}
+.score-badge{font-size:11px;font-weight:800;padding:4px 8px;border-radius:99px;margin-left:auto;white-space:nowrap}
+.score-good{background:#dcfce7;color:#166534}.score-mid{background:#fef9c3;color:#854d0e}.score-bad{background:#fee2e2;color:#991b1b}.score-none{background:#e2e8f0;color:#64748b}
+.score-box{background:#0f172a;border:1px solid #ffcc00;border-radius:12px;padding:12px;margin-top:10px}
+.emo-btn{padding:10px 6px;font-size:13px;margin:4px 0}
+</style></head><body>
+<div class="top">
+<span class="badge">🎓 EAC • ARUSHA • ENGLISH • 100% ONLINE</span>
+<h1>Learn English.<br><span>Get a Better Job.</span></h1>
+<p class="sub">4 practical courses for East Africa. Speaking, Vocabulary, Real Life.<br>Burundi • Kenya • Tanzania • Uganda • Rwanda • DRC • Somalia • South Sudan<br>1 Key = 1 Course + 1 Level = 1 Phone = Your Period.</p>
+
+<!-- ===== EMOTION ENGINE TEST - EAC - 2 POINTS NOT FLAT ===== -->
+<div class="card" style="background:#1a1600;border-color:#ffcc00;text-align:center">
+<b style="color:#ffcc00">🎙️ Listen to Mary & John - Test Voices + Emotions</b>
+<p style="font-size:13px;color:#cbd5e1;margin:6px 0">Mary = Female - Arusha • John = Male - Nairobi • 2 Points = Pitch+Speed + Words+Pauses</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<button class="btn-gold emo-btn" onclick="speakMary('Hello! My name is Mary. I am happy to meet you!', 'happy')">👩 Mary - Happy</button>
+<button style="background:#38bdf8;color:#000" class="emo-btn" onclick="speakJohn('Hello! My name is John. I work in Nairobi.', 'calm')">👨 John - Calm</button>
+<button class="emo-btn" style="background:#f472b6;color:#000" onclick="speakMary('Wow! I love East Africa!', 'excited')">🤩 Mary - Excited</button>
+<button class="emo-btn" style="background:#a78bfa;color:#000" onclick="speakJohn('Oh... I am sad today. I miss my family.', 'sad')">😢 John - Sad</button>
+<button class="emo-btn" style="background:#facc15;color:#000" onclick="speakMary('I am calm. We learn slowly. We learn well.', 'calm')">😌 Mary - Calm</button>
+<button class="emo-btn" style="background:#ef4444;color:#fff" onclick="stopSpeak()">⏹️ STOP</button>
+</div>
+</div>
+
+<div class="card" style="background:#1a1600;border-color:#ffcc00;text-align:center">
+<b style="color:#ffcc00">🔑 Enter Your Key to Open Your Course</b>
+<div id="keyBox">
+<input id="keyInput" placeholder="Ex: GENERAL-7K9X2" maxlength="20">
+<button class="btn-gold" onclick="checkKey()">📚 OUVRIR MES COURS</button>
+<p id="keyMsg" style="font-size:13px;color:#cbd5e1;margin:10px 0 0;"></p>
+</div>
+<div id="welcomeBox" style="display:none;text-align:left">
+<p style="margin:0">👋 Welcome <b id="welcomeName" style="color:#ffcc00"></b></p>
+<p style="margin:4px 0;color:#cbd5e1;font-size:13px" id="welcomeInfo"></p>
+<div id="myScoreBox" class="score-box" style="display:none">
+<b style="color:#ffcc00">📊 MY SCORES</b>
+<p id="myScoreSummary" style="margin:6px 0;color:#fff;font-size:14px">Loading scores...</p>
+<p id="myScoreDetail" style="margin:0;color:#cbd5e1;font-size:12px;line-height:1.6"></p>
+</div>
+<button onclick="logoutKey()" style="background:#1e2540;color:#fff;padding:8px;font-size:12px;width:auto;margin-top:10px">🚪 Change Key / Logout</button>
+</div>
+</div>
+
+<div id="howBox" class="card" style="background:#1a1600;border-color:#ffcc00">
+<b style="color:#ffcc00">✨ Comment ça marche ? 3 étapes</b>
+<div class="step"><div class="num">1</div><div><b>Demande ta Clé sur WhatsApp</b><br><span style="color:#cbd5e1;font-size:13px">Dis quel cours + niveau tu veux: General Pre-A1, A1.1, A1.2... - East Africa</span></div></div>
+<div class="step"><div class="num">2</div><div><b>Reçois ta Clé + ta Période</b><br><span style="color:#cbd5e1;font-size:13px">Ex: GENERAL-7K9X2 • Pre-A1 • 30 jours • Arusha / Nairobi / Kampala / Kigali / Bujumbura</span></div></div>
+<div class="step"><div class="num">3</div><div><b>Ouvre ton Cours + Étudie</b><br><span style="color:#cbd5e1;font-size:13px">8 Units per Level. Vidéos + Quiz + Devoir WhatsApp. Mary & John - East Africa.</span></div></div>
+</div>
+
+<div style="text-align:left" id="coursesList">
+<div class="course locked" data-course="General English" onclick="openCourse('General English')"><div class="icon">🇬🇧</div><div><b>General English</b> <span class="pill">Pre-A1 → C2.2</span><p>104 GUNITs. Mary & John. For everyday life, school, work in East Africa.</p></div></div>
+<div class="course locked" data-course="Legal English" onclick="openCourse('Legal English')"><div class="icon">⚖️</div><div><b>Legal English</b> <span class="pill">LAW</span><p>Contracts, Court, Legal Writing - EAC.</p></div></div>
+<div class="course locked" data-course="Business English" onclick="openCourse('Business English')"><div class="icon">💼</div><div><b>Business English</b> <span class="pill">JOB</span><p>Meetings, Emails, Negotiations - EAC.</p></div></div>
+<div class="course locked" data-course="Medical English" onclick="openCourse('Medical English')"><div class="icon">🩺</div><div><b>Medical English</b> <span class="pill">HEALTH</span><p>Hospital Vocabulary - EAC.</p></div></div>
+</div>
+
+<div id="unitsBox" style="display:none;text-align:left">
+<h3 id="unitsTitle" style="margin:12px 0 4px"></h3>
+<p id="unitsSub" style="color:#cbd5e1;font-size:13px;margin:0 0 8px"></p>
+<div id="unitsList"></div>
+</div>
+
+<p id="courseHint" style="font-size:13px;color:#ffcc00">🔒 Enter your Key above to unlock your course</p>
+
+<div class="card">
+<b>❓ Questions fréquentes - East Africa</b>
+<p style="font-size:13px;line-height:1.6;color:#cbd5e1"><b style="color:#fff">Est-ce que je peux partager ma clé ?</b><br>Non. 1 clé = 1 téléphone.<br><br><b style="color:#fff">Et si ma période expire ?</b><br>Admin peut renouveler ta même clé.<br><br><b style="color:#fff">Je peux étudier sur un autre téléphone ?</b><br>Non, contacte Admin si tu changes de téléphone.<br><br><b style="color:#fff">Où est ISOMERO ?</b><br>Arusha, Tanzania - HQ of East African Community - For all 8 EAC countries.</p>
+</div>
+<p class="small">ISOMERO • Arusha - HQ of EAC • East Africa<br>Burundi • Kenya • Tanzania • Uganda • Rwanda • DRC • Somalia • South Sudan<br><a href="manage-users.html" style="color:#475569">Admin - Manage Users</a></p>
+<div style="height:90px"></div>
+</div>
+<div class="cta">
+<button class="btn-gold" onclick="document.getElementById('keyInput').focus();window.scrollTo(0,0)">📚 OUVRIR MES COURS - J'ai ma Clé</button>
+<a href="https://wa.me/25762706404?text=Hello%20ISOMERO%2C%20I%20want%20an%20Enrolment%20Key.%20Which%20course%3F%20General%20%2F%20Legal%20%2F%20Business%20%2F%20Medical" target="_blank"><button class="btn-wa" style="margin-top:8px">💬 Demander ma Clé sur WhatsApp - 62706404</button></a>
+</div>
+
+<!-- ===== EMOTION ENGINE - 2 POINTS - NOT FLAT - EAC - IN APP ONLY ===== -->
+<script>
+function addEmotionWords(text, emotion){
+  let t = String(text||'').trim();
+  if(emotion=='happy') return t.replace(/\./g,'!') + '! Ha!';
+  if(emotion=='excited') return 'Wow! ' + t.replace(/\./g,'!') + '! Yes!';
+  if(emotion=='sad') return 'Oh... ' + t.replace(/\./g,'...') + '...';
+  if(emotion=='angry') return t.toUpperCase() + '!';
+  if(emotion=='calm') return t.replace(/\./g,', ...') + ', ...';
+  return t;
+}
+function speakEmotion(text, emotion, isFemale){
+  if(!('speechSynthesis' in window)){ alert('Voice not supported. Use Chrome.'); return; }
+  window.speechSynthesis.cancel();
+  let u = new SpeechSynthesisUtterance(addEmotionWords(text, emotion));
+  u.lang = 'en-US';
+  if(emotion=='happy'){ u.pitch=1.3; u.rate=1.1; }
+  else if(emotion=='excited'){ u.pitch=1.4; u.rate=1.2; }
+  else if(emotion=='sad'){ u.pitch=0.7; u.rate=0.7; }
+  else if(emotion=='angry'){ u.pitch=0.8; u.rate=1.2; }
+  else if(emotion=='calm'){ u.pitch=1.0; u.rate=0.85; }
+  else { u.pitch = isFemale ? 1.1 : 0.85; u.rate=0.9; }
+  let vs = window.speechSynthesis.getVoices().filter(v=>v.lang && v.lang.toLowerCase().startsWith('en'));
+  if(vs.length){
+    if(isFemale) u.voice = vs.find(v=>/female|zira|aria|samantha|jenny/i.test(v.name)) || vs[0];
+    else u.voice = vs.find(v=>/male|david|guy|daniel|ryan/i.test(v.name)) || vs[vs.length-1];
+  }
+  window.speechSynthesis.speak(u);
+}
+function speakMary(t,e){ speakEmotion(t, e||'normal', 1); }
+function speakJohn(t,e){ speakEmotion(t, e||'normal', 0); }
+function stopSpeak(){ if('speechSynthesis' in window) window.speechSynthesis.cancel(); }
+if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = ()=>{ window.speechSynthesis.getVoices(); }; }
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3TEX60jk", authDomain: "isomero-f6887.firebaseapp.com", projectId: "isomero-f6887", storageBucket: "isomero-f6887.appspot.com", messagingSenderId: "109876543210", appId: "1:109876543210:web:isomero123456" };
+const app = initializeApp(firebaseConfig); const db = getFirestore(app);
+// CURRICULUM EAC - 104 GUNITs - Use units.js ISOMERO_DATA for full readingText - This list is for App menu only
+const CURRICULUM = {
+"Pre-A1":{theme:"Me & My World - East Africa",units:[["GUNIT1","Hello, I Am Mary","I can say hello and my name"],["GUNIT2","My Family","I can name my family"],["GUNIT3","My Body","I can name body parts"],["GUNIT4","Colors Around Me","I can name colors"],["GUNIT5","Numbers 1 to 10","I can count to 10"],["GUNIT6","My Work - School","I can name work things"],["GUNIT7","Animals I Know","I can name animals"],["GUNIT8","I Like Food","I can say what I like"]]},
+"A1.1":{theme:"My Day",units:[["GUNIT9","In the Morning","I can talk about morning routine"],["GUNIT10","At Work","I can talk about work day"],["GUNIT11","My Friends","I can describe friends"],["GUNIT12","My House","I can name rooms"],["GUNIT13","Weather Today","I can talk about weather"],["GUNIT14","My Clothes","I can name clothes"],["GUNIT15","Food Market","I can buy food"],["GUNIT16","My Evening","I can talk about evening"]]},
+"A1.2":{theme:"My Community",units:[["GUNIT17","My Neighbours","I can talk about neighbours"],["GUNIT18","At the Church","I can talk about Sunday"],["GUNIT19","The Doctor","I can say I am sick"],["GUNIT20","Transport","I can name transport"],["GUNIT21","My Village","I can describe village"],["GUNIT22","Seasons in East Africa","I can talk about seasons"],["GUNIT23","My Birthday","I can talk about birthday"],["GUNIT24","Helping at Home","I can talk about chores"]]},
+"A2.1":{theme:"Stories & Daily Life",units:[["GUNIT25","A Day with Grandma","I can tell a day story"],["GUNIT26","The Lost Goat","I can tell past story"],["GUNIT27","Football Match","I can talk about sport"],["GUNIT28","My Best Friend","I can describe person"],["GUNIT29","At the Lake","I can talk about nature"],["GUNIT30","Shopping with Mama","I can talk about shopping"],["GUNIT31","My Future Dream","I can talk about future"],["GUNIT32","Rainy Day","I can talk about weather past"]]},
+"A2.2":{theme:"My Country - My Region",units:[["GUNIT33","East Africa My Home","I can describe East Africa"],["GUNIT34","Coffee Farmers","I can talk about coffee"],["GUNIT35","Drums of East Africa","I can talk about culture"],["GUNIT36","My Town Arusha","I can describe town"],["GUNIT37","Helping My Community","I can talk about helping"],["GUNIT38","Animals in East Africa","I can talk about animals"],["GUNIT39","My Work Rules","I can talk about rules"],["GUNIT40","A Trip to Nairobi","I can tell travel story"]]},
+"B1.1":{theme:"My Story",units:[["GUNIT41","When I Was Young","I can tell story about past"],["GUNIT42","The Day I Learned to Swim","I can tell learning story"],["GUNIT43","My First Day at Work","I can talk about first day"],["GUNIT44","A Difficult Exam","I can talk about challenges"],["GUNIT45","Helping a Stranger","I can tell moral story"],["GUNIT46","My Role Model","I can describe role model"],["GUNIT47","A Dream I Had","I can talk about dreams"],["GUNIT48","Learning from Mistakes","I can talk about mistakes"]]},
+"B1.2":{theme:"Work & Money",units:[["GUNIT49","Small Business","I can talk about business"],["GUNIT50","My Work - John's Shop","I can talk about work"],["GUNIT51","Saving Money","I can talk about saving"],["GUNIT52","At the Bank","I can talk about bank"],["GUNIT53","Farming for Money","I can talk about farming"],["GUNIT54","Interview Practice","I can answer interview questions"],["GUNIT55","Online Work","I can talk about online work"],["GUNIT56","Budget for Family","I can make budget"]]},
+"B2.1":{theme:"Ideas & Opinions",units:[["GUNIT57","Should Phones Be Allowed?","I can give opinion"],["GUNIT58","Climate Change","I can talk about climate"],["GUNIT59","Education for Girls","I can argue for education"],["GUNIT60","Social Media","I can discuss social media"],["GUNIT61","Health and Food","I can talk about health"],["GUNIT62","My City vs Village","I can compare places"],["GUNIT63","A Book That Changed Me","I can talk about book"],["GUNIT64","Future of East Africa","I can talk about future"]]},
+"B2.2":{theme:"Leadership",units:[["GUNIT65","What Is Leadership?","I can define leadership"],["GUNIT66","Starting a Project","I can plan project"],["GUNIT67","Public Speaking","I can speak in public"],["GUNIT68","Solving Conflict","I can talk about peace"],["GUNIT69","Entrepreneur Story","I can tell entrepreneur story"],["GUNIT70","Technology in East Africa","I can talk about tech"],["GUNIT71","My Opinion Essay","I can write opinion"],["GUNIT72","Preparing for Exam","I can plan study"]]},
+"C1.1":{theme:"Critical Thinking",units:[["GUNIT73","Media Literacy","I can analyse media"],["GUNIT74","The Power of Language","I can discuss language"],["GUNIT75","Poverty and Solutions","I can discuss poverty"],["GUNIT76","History Matters","I can talk about history"],["GUNIT77","Women in Leadership","I can discuss gender"],["GUNIT78","Ethics and Honesty","I can discuss ethics"],["GUNIT79","Science and Innovation","I can talk about science"],["GUNIT80","Debate: Tradition vs Modern","I can debate"]]},
+"C1.2":{theme:"Global Citizen - EAC Citizen",units:[["GUNIT81","East Africa Community","I can talk about EAC"],["GUNIT82","Migration Stories","I can discuss migration"],["GUNIT83","Climate Justice","I can argue climate justice"],["GUNIT84","The Future of Work","I can talk about future work"],["GUNIT85","Writing a CV","I can write CV"],["GUNIT86","Negotiation","I can negotiate"],["GUNIT87","Presenting an Idea","I can present idea"],["GUNIT88","Global English","I can discuss Global English"]]},
+"C2.1":{theme:"Mastery",units:[["GUNIT89","Philosophy of Ubuntu","I can discuss Ubuntu"],["GUNIT90","Critical Essay: Development","I can write critical essay"],["GUNIT91","Storytelling as Power","I can analyse storytelling"],["GUNIT92","Research Skills","I can do research"],["GUNIT93","Leadership Speech","I can write speech"],["GUNIT94","Business Plan","I can write business plan"],["GUNIT95","Diplomacy","I can talk about diplomacy"],["GUNIT96","Teaching Others","I can teach"]]},
+"C2.2":{theme:"Legacy - East Africa",units:[["GUNIT97","My Legacy","I can talk about legacy"],["GUNIT98","Writing a Book","I can plan a book"],["GUNIT99","Mentoring Youth","I can mentor"],["GUNIT100","Isomero Vision - EAC","I can present vision"],["GUNIT101","Global Speaker","I can speak globally"],["GUNIT102","Research Project","I can present research"],["GUNIT103","Building a School","I can plan a school"],["GUNIT104","Graduation - I Can Speak","I can celebrate fluency"]]}
+};
+function getDeviceId(){ let id = localStorage.getItem('isomero_device'); if(!id){ id='DEV-'+Math.random().toString(36).substring(2,10).toUpperCase(); localStorage.setItem('isomero_device', id); } return id; }
+function fmt(ts){ return new Date(ts).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+let currentKeyData = null; let myScoresMap = {};
+window.checkKey = async function(){ let key = document.getElementById('keyInput').value.trim().toUpperCase(); let msg = document.getElementById('keyMsg'); if(!key) return msg.innerHTML='❌ Enter your Key'; msg.innerHTML='⏳ Checking...'; msg.style.color='#ffcc00'; try{ let snap = await getDoc(doc(db,'enrolmentKeys',key)); if(!snap.exists()){ msg.innerHTML='❌ Key not found. Check spelling.'; msg.style.color='#ff2a5a'; return; } let d = snap.data(); if(d.revoked){ msg.innerHTML='🚫 This Key is REVOKED. Contact Admin on WhatsApp.'; msg.style.color='#ff2a5a'; return; } let now = Date.now(); if(now < d.startAt){ msg.innerHTML='⏳ Not started yet. Starts '+fmt(d.startAt); msg.style.color='#ffcc00'; return; } if(now > d.expiresAt){ msg.innerHTML='⏰ EXPIRED on '+fmt(d.expiresAt)+'. Contact Admin to Renew.'; msg.style.color='#ff2a5a'; return; } let deviceId = getDeviceId(); if(d.used && d.deviceId && d.deviceId !== deviceId){ msg.innerHTML='🚫 This Key is already used on another phone. Contact Admin.'; msg.style.color='#ff2a5a'; return; } if(!d.used){ try{ await updateDoc(doc(db,'enrolmentKeys',key),{ used:true, deviceId:deviceId, usedAt:Date.now() }); }catch(e){} } if(!d.level) d.level = 'Pre-A1'; currentKeyData = {key, ...d, deviceId}; localStorage.setItem('isomero_key', key); localStorage.setItem('isomero_course', d.course); localStorage.setItem('isomero_level', d.level); localStorage.setItem('isomero_name', d.studentName||''); localStorage.setItem('studentKey', key); localStorage.setItem('studentName', d.studentName||'Student'); localStorage.setItem('studentBranch', d.course||'General English'); localStorage.setItem('studentLevel', d.level); showWelcome(d, key); loadMyScores(); }catch(e){ msg.innerHTML='❌ '+e.message; msg.style.color='#ff2a5a'; } }
+function showWelcome(d, key){ document.getElementById('keyBox').style.display='none'; document.getElementById('welcomeBox').style.display='block'; document.getElementById('welcomeName').innerText = d.studentName||'Student'; document.getElementById('welcomeInfo').innerHTML = `✅ <b>${d.course} • ${d.level}</b> • Key: ${key} • 📅 ${fmt(d.startAt)} → ${fmt(d.expiresAt)} • ${Math.ceil((d.expiresAt-Date.now())/86400000)} days left`; document.getElementById('howBox').style.display='none'; document.getElementById('courseHint').innerHTML='✅ Your course is unlocked below - click a Unit'; document.querySelectorAll('.course').forEach(c=>{ if(c.dataset.course === d.course){ c.classList.remove('locked'); c.style.border='2px solid #00ff88'; } else { c.style.display='none'; } }); showUnits(d.course, d.level); }
+async function loadMyScores(){ if(!currentKeyData) return; document.getElementById('myScoreBox').style.display='block'; try{ const q = query(collection(db,'scores'), where('key','==', currentKeyData.key)); const snap = await getDocs(q); myScoresMap = {}; let totalPercent = 0, count = 0, detailHtml = ''; snap.forEach(docSnap=>{ const s = docSnap.data(); if(!myScoresMap[s.unitId] || s.percent > myScoresMap[s.unitId].percent) myScoresMap[s.unitId] = s; }); Object.keys(myScoresMap).forEach(unitId=>{ const s = myScoresMap[unitId]; totalPercent += s.percent; count++; detailHtml += `✅ ${unitId}: <b>${s.percent}%</b> (${s.score}/${s.total}) • `; }); if(count===0){ document.getElementById('myScoreSummary').innerHTML = `No quiz yet. Finish a Unit quiz to get your first score!`; document.getElementById('myScoreDetail').innerHTML = ``; } else { const avg = Math.round(totalPercent/count); document.getElementById('myScoreSummary').innerHTML = `🏆 Average: <b>${avg}%</b> • ${count} quiz done • Best: <b>${Math.max(...Object.values(myScoresMap).map(x=>x.percent))}%</b>`; document.getElementById('myScoreDetail').innerHTML = detailHtml; } if(currentKeyData) showUnits(currentKeyData.course, currentKeyData.level); }catch(e){ document.getElementById('myScoreSummary').innerHTML = `Scores will show after first quiz.`; } }
+function scoreBadge(unitId){ const s = myScoresMap[unitId]; if(!s) return `<span class="score-badge score-none">Not done</span>`; let cls = s.percent>=80 ? 'score-good' : s.percent>=50 ? 'score-mid' : 'score-bad'; return `<span class="score-badge ${cls}">🏆 ${s.percent}%</span>`; }
+function showUnits(course, level){ if(course !== 'General English'){ document.getElementById('unitsBox').style.display='none'; return; } let lvlData = CURRICULUM[level]; if(!lvlData){ document.getElementById('unitsBox').style.display='none'; return; } document.getElementById('unitsBox').style.display='block'; document.getElementById('unitsTitle').innerText = `📚 ${level} - ${lvlData.theme}`; document.getElementById('unitsSub').innerText = `8 Units • Mary & John • East Africa • Click a Unit to start`; let html = ''; lvlData.units.forEach(u=>{ let num = u[0].replace('GUNIT',''); html += `<div class="unit" onclick="openUnit(${num})"><div class="unum">${u[0]}</div><div><b>${u[1]}</b><p>✅ ${u[2]}</p></div>${scoreBadge(u[0])}</div>`; }); document.getElementById('unitsList').innerHTML = html; }
+window.openCourse = function(course){ if(!currentKeyData) return alert('Enter your Key first'); if(course !== currentKeyData.course) return alert('Your Key is for '+currentKeyData.course); if(course !== 'General English') return alert('🎉 '+course+' • '+currentKeyData.level+' unlocked!\n\nLessons coming soon. Contact Admin on WhatsApp.'); document.getElementById('unitsBox').scrollIntoView({behavior:'smooth'}); }
+window.openUnit = function(num){ if(!currentKeyData) return alert('Enter your Key first'); window.location.href = 'gunit'+num+'.html'; }
+window.logoutKey = function(){ localStorage.removeItem('isomero_key'); localStorage.removeItem('isomero_course'); localStorage.removeItem('isomero_level'); location.reload(); }
+window.addEventListener('DOMContentLoaded', ()=>{ let saved = localStorage.getItem('isomero_key'); if(saved){ document.getElementById('keyInput').value=saved; window.checkKey(); } });
+</script>
+</body></html>
