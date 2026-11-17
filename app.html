@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ISOMERO - Arusha</title><style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#0a0e1f;color:#fff}
+.top{max-width:560px;margin:auto;padding:16px 12px 8px;text-align:center}
+.badge{display:inline-block;background:#ffcc00;color:#000;font-size:11px;font-weight:800;padding:6px 12px;border-radius:99px}
+h1{font-size:32px;line-height:1.1;margin:12px 0 6px}h1 span{color:#ffcc00}
+.sub{color:#cbd5e1;font-size:15px;line-height:1.5;margin:0}
+.cta{position:sticky;bottom:0;background:#0a0e1f;padding:10px 12px;border-top:1px solid #1e2540;max-width:560px;margin:auto;z-index:10}
+button{border:none;border-radius:12px;font-weight:800;cursor:pointer;padding:15px;width:100%;font-size:16px}
+.btn-gold{background:#ffcc00;color:#000}.btn-wa{background:#25D366;color:#fff}
+.card{background:#131a36;border:1px solid #1e2540;border-radius:16px;padding:14px;margin:12px 0;text-align:left}
+.course{display:flex;gap:12px;background:#fff;color:#111;border-radius:14px;padding:14px;margin:10px 0;align-items:center;cursor:pointer}
+.course .icon{font-size:32px}.course b{font-size:16px}.course p{margin:4px 0 0;color:#64748b;font-size:13px;line-height:1.4}
+.pill{font-size:11px;background:#fef9c3;padding:4px 8px;border-radius:99px;font-weight:700}
+.step{display:flex;gap:12px;align-items:flex-start;margin:12px 0}.num{width:32px;height:32px;background:#ffcc00;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.small{font-size:12px;color:#94a3b8;text-align:center}
+a{color:inherit;text-decoration:none}
+input{background:#0f1326;color:#fff;border:1px solid #1e2540;padding:14px;border-radius:12px;width:100%;margin:8px 0;font-size:16px;text-align:center;text-transform:uppercase;font-weight:800;letter-spacing:1px}
+.locked{opacity:0.4;pointer-events:none}
+.unit{display:flex;gap:12px;background:#fff;color:#111;border-radius:14px;padding:14px;margin:10px 0;align-items:center;cursor:pointer}
+.unit b{font-size:15px}.unit p{margin:4px 0 0;color:#64748b;font-size:12px}
+.unum{width:42px;height:42px;background:#ffcc00;color:#000;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;font-size:13px}
+.score-badge{font-size:11px;font-weight:800;padding:4px 8px;border-radius:99px;margin-left:auto;white-space:nowrap}
+.score-good{background:#dcfce7;color:#166534}.score-mid{background:#fef9c3;color:#854d0e}.score-bad{background:#fee2e2;color:#991b1b}.score-none{background:#e2e8f0;color:#64748b}
+.score-box{background:#0f172a;border:1px solid #ffcc00;border-radius:12px;padding:12px;margin-top:10px}
+.emo-btn{padding:10px 6px;font-size:13px;margin:4px 0}
+.unit-btn{padding:10px;font-size:13px;margin-top:8px}
+</style></head><body>
+<div class="top">
+<span class="badge">🎓 EAC • ARUSHA • ENGLISH • 100% ONLINE</span>
+<h1>Learn English.<br><span>Get a Better Job.</span></h1>
+<p class="sub">4 practical courses for East Africa. Speaking, Vocabulary, Real Life.<br>Burundi • Kenya • Tanzania • Uganda • Rwanda • DRC • Somalia • South Sudan<br>1 Key = 1 Course + 1 Level = 1 Phone = Your Period.</p>
+<div class="card" style="background:#1a1600;border-color:#ffcc00;text-align:center">
+<b style="color:#ffcc00">🎙️ Listen to Mary & John</b>
+<p style="font-size:13px;color:#cbd5e1;margin:6px 0">Mary = Female - Arusha • John = Male - Nairobi</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<button class="btn-gold emo-btn" onclick="speakMary('Yes! I did it! I passed!', 'happy')">👩 Mary - Happy</button>
+<button style="background:#38bdf8;color:#000" class="emo-btn" onclick="speakJohn('Welcome. Sit down. We learn slowly.', 'calm')">👨 John - Calm</button>
+<button class="emo-btn" style="background:#f472b6;color:#000" onclick="speakMary('Look! Kilimanjaro! So beautiful!', 'excited')">🤩 Mary - Excited</button>
+<button class="emo-btn" style="background:#a78bfa;color:#000" onclick="speakJohn('Oh no... I miss home...', 'sad')">😢 John - Sad</button>
+<button class="emo-btn" style="background:#facc15;color:#000" onclick="speakMary('Oh... What if I fail?', 'nervous')">😨 Mary - Nervous</button>
+<button class="emo-btn" style="background:#ef4444;color:#fff" onclick="stopSpeak()">⏹️ STOP</button>
+</div></div>
+<div class="card" style="background:#1a1600;border-color:#ffcc00;text-align:center">
+<b style="color:#ffcc00">🔑 Enter Your Key</b>
+<div id="keyBox"><input id="keyInput" placeholder="Ex: GENERAL-7K9X2" maxlength="20">
+<button class="btn-gold" onclick="checkKey()">📚 OUVRIR MES COURS</button>
+<p id="keyMsg" style="font-size:13px;color:#cbd5e1;margin:10px 0 0;"></p></div>
+<div id="welcomeBox" style="display:none;text-align:left">
+<p style="margin:0">👋 Welcome <b id="welcomeName" style="color:#ffcc00"></b></p>
+<p style="margin:4px 0;color:#cbd5e1;font-size:13px" id="welcomeInfo"></p>
+<div id="myScoreBox" class="score-box" style="display:none"><b style="color:#ffcc00">📊 MY SCORES</b>
+<p id="myScoreSummary" style="margin:6px 0;color:#fff;font-size:14px">Loading...</p>
+<p id="myScoreDetail" style="margin:0;color:#cbd5e1;font-size:12px;line-height:1.6"></p></div>
+<button onclick="logoutKey()" style="background:#1e2540;color:#fff;padding:8px;font-size:12px;width:auto;margin-top:10px">🚪 Change Key / Logout</button>
+</div></div>
+<div id="howBox" class="card" style="background:#1a1600;border-color:#ffcc00">
+<b style="color:#ffcc00">✨ Comment ça marche ? 3 étapes</b>
+<div class="step"><div class="num">1</div><div><b>Demande ta Clé sur WhatsApp</b><br><span style="color:#cbd5e1;font-size:13px">Dis quel cours + niveau tu veux</span></div></div>
+<div class="step"><div class="num">2</div><div><b>Reçois ta Clé + ta Période</b><br><span style="color:#cbd5e1;font-size:13px">Ex: GENERAL-7K9X2 • Pre-A1 • 30 jours</span></div></div>
+<div class="step"><div class="num">3</div><div><b>Ouvre ton Cours + Étudie</b><br><span style="color:#cbd5e1;font-size:13px">8 Units per Level. Vidéos + Quiz + Devoir WhatsApp.</span></div></div>
+</div>
+<div style="text-align:left" id="coursesList">
+<div class="course locked" data-course="General English" onclick="openCourse('General English')"><div class="icon">🇬🇧</div><div><b>General English</b> <span class="pill">Pre-A1 → C2.2</span><p>104 GUNITs. Mary & John. For everyday life, school, work.</p></div></div>
+<div class="course locked" data-course="Legal English" onclick="openCourse('Legal English')"><div class="icon">⚖️</div><div><b>Legal English</b> <span class="pill">LAW</span><p>Contracts, Court, Legal Writing - EAC.</p></div></div>
+<div class="course locked" data-course="Business English" onclick="openCourse('Business English')"><div class="icon">💼</div><div><b>Business English</b> <span class="pill">JOB</span><p>Meetings, Emails, Negotiations - EAC.</p></div></div>
+<div class="course locked" data-course="Medical English" onclick="openCourse('Medical English')"><div class="icon">🩺</div><div><b>Medical English</b> <span class="pill">HEALTH</span><p>Hospital Vocabulary - EAC.</p></div></div>
+</div>
+<div id="unitsBox" style="display:none;text-align:left">
+<h3 id="unitsTitle"></h3><p id="unitsSub" style="color:#cbd5e1;font-size:13px"></p><div id="unitsList"></div></div>
+<div id="unitDetailBox" style="display:none;text-align:left" class="card">
+<h3 id="unitDetailTitle"></h3><p id="unitDetailDesc" style="color:#cbd5e1;font-size:14px"></p>
+<p style="font-size:13px;color:#cbd5e1">🎧 Listen, repeat, then take Final Test. Need 28/40 to pass.</p>
+<button class="btn-gold" onclick="speakUnit()">🎙️ Listen - Mary & John</button>
+<button class="btn-gold" style="margin-top:8px" onclick="startFinalForCurrent()">📝 START FINAL TEST - 40 Qs - 30 Min</button>
+<button style="margin-top:8px;background:#1e2540;color:#fff" onclick="backToUnits()">⬅️ Back to Units</button>
+</div>
+<p id="courseHint" style="font-size:13px;color:#ffcc00">🔒 Enter your Key above to unlock</p>
+<div class="card"><b>❓ Questions fréquentes - East Africa</b>
+<p style="font-size:13px;line-height:1.6;color:#cbd5e1"><b style="color:#fff">Partager ma clé ?</b><br>Non. 1 clé = 1 téléphone.<br><br><b style="color:#fff">Période expire ?</b><br>Admin peut renouveler.<br><br><b style="color:#fff">Où est ISOMERO ?</b><br>Arusha, Tanzania - HQ of EAC.</p></div>
+<p class="small">ISOMERO • Arusha - HQ of EAC • East Africa<br><a href="manage-users.html" style="color:#475569">Admin - Manage Users</a></p>
+<div style="height:90px"></div></div>
+<div class="cta">
+<button class="btn-gold" onclick="document.getElementById('keyInput').focus();window.scrollTo(0,0)">📚 OUVRIR MES COURS - J'ai ma Clé</button>
+<a href="https://wa.me/25762706404?text=Hello%20ISOMERO" target="_blank"><button class="btn-wa" style="margin-top:8px">💬 Demander ma Clé sur WhatsApp - 62706404</button></a>
+</div>
+<script>
+let _VOICES=[];
+function getVoicesLocked(){ if(_VOICES.length) return _VOICES; _VOICES=window.speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.toLowerCase().startsWith('en')); return _VOICES; }
+function pickVoice(isFemale){
+  let vs=getVoicesLocked(); if(!vs.length) return null;
+  if(isFemale) return vs.find(v=>/female|zira|aria|samantha|jenny|google us english/i.test(v.name))||vs[0];
+  let mary=vs.find(v=>/female|zira|aria|samantha|jenny|google us english/i.test(v.name))||vs[0];
+  let male=vs.find(v=>/male|david|guy|daniel|ryan/i.test(v.name));
+  if(male&&male!==mary) return male;
+  let others=vs.filter(v=>v!==mary); if(others.length) return others[others.length-1]; return mary;
+}
+function speakEmotion(text, emotion, isFemale){
+  if(!('speechSynthesis' in window)){ alert('Voice not supported. Use Chrome.'); return; }
+  window.speechSynthesis.cancel();
+  let parts = String(text||'').match(/[^.!?]+[.!?]+/g) || [text];
+  let i=0;
+  function next(){
+    if(i>=parts.length) return;
+    let s=parts[i].trim(); i++; if(!s) return next();
+    let u=new SpeechSynthesisUtterance(s); u.lang='en-US';
+    let v=(i%3-1)*0.06;
+    if(emotion=='happy'){ if(isFemale){u.pitch=1.18+v;u.rate=1.05;} else {u.pitch=0.92+v;u.rate=1.02;} }
+    else if(emotion=='excited'){ if(isFemale){u.pitch=1.22+v;u.rate=1.12;} else {u.pitch=0.95+v;u.rate=1.10;} }
+    else if(emotion=='sad'){ if(isFemale){u.pitch=0.95+v*0.5;u.rate=0.88;} else {u.pitch=0.78+v*0.5;u.rate=0.85;} }
+    else if(emotion=='nervous'){ if(isFemale){u.pitch=1.12+v;u.rate=0.92;} else {u.pitch=0.88+v;u.rate=0.90;} }
+    else if(emotion=='calm'){ if(isFemale){u.pitch=1.08+v*0.5;u.rate=0.92;} else {u.pitch=0.85+v*0.5;u.rate=0.90;} }
+    else { if(isFemale){u.pitch=1.12;u.rate=0.98;} else {u.pitch=0.88;u.rate=0.95;} }
+    let voice=pickVoice(isFemale); if(voice) u.voice=voice;
+    let pause=emotion=='sad'?600:emotion=='nervous'?500:emotion=='calm'?400:emotion=='excited'?90:250;
+    u.onend=()=>setTimeout(next,pause); u.onerror=()=>next();
+    window.speechSynthesis.speak(u);
+  }
+  next();
+}
+function speakMary(t,e){ speakEmotion(t,e||'normal',1); }
+function speakJohn(t,e){ speakEmotion(t,e||'normal',0); }
+function stopSpeak(){ if('speechSynthesis' in window) window.speechSynthesis.cancel(); }
+if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged=()=>{ _VOICES=[]; window.speechSynthesis.getVoices(); }; }
+</script>
+
+<script>
+window.CURRICULUM = {
+"Pre-A1":{theme:"Me & My World",units:[["GUNIT1","Hello, I Am Mary","I can say hello and my name"],["GUNIT2","My Family","I can name my family"],["GUNIT3","My Body","I can name body parts"],["GUNIT4","Colors Around Me","I can name colors"],["GUNIT5","Numbers 1 to 10","I can count to 10"],["GUNIT6","My Work - School","I can name work things"],["GUNIT7","Animals I Know","I can name animals"],["GUNIT8","I Like Food","I can say what I like"]]},
+"A1.1":{theme:"My Day",units:[["GUNIT9","In the Morning","I can talk about morning routine"],["GUNIT10","At Work","I can talk about work day"],["GUNIT11","My Friends","I can describe friends"],["GUNIT12","My House","I can name rooms"],["GUNIT13","Weather Today","I can talk about weather"],["GUNIT14","My Clothes","I can name clothes"],["GUNIT15","Food Market","I can buy food"],["GUNIT16","My Evening","I can talk about evening"]]},
+"A1.2":{theme:"My Community",units:[["GUNIT17","My Neighbours","I can talk about neighbours"],["GUNIT18","At the Church","I can talk about Sunday"],["GUNIT19","The Doctor","I can say I am sick"],["GUNIT20","Transport","I can name transport"],["GUNIT21","My Village","I can describe village"],["GUNIT22","Seasons in East Africa","I can talk about seasons"],["GUNIT23","My Birthday","I can talk about birthday"],["GUNIT24","Helping at Home","I can talk about chores"]]},
+"A2.1":{theme:"Stories & Daily Life",units:[["GUNIT25","A Day with Grandma","I can tell a day story"],["GUNIT26","The Lost Goat","I can tell past story"],["GUNIT27","Football Match","I can talk about sport"],["GUNIT28","My Best Friend","I can describe person"],["GUNIT29","At the Lake","I can talk about nature"],["GUNIT30","Shopping with Mama","I can talk about shopping"],["GUNIT31","My Future Dream","I can talk about future"],["GUNIT32","Rainy Day","I can talk about weather past"]]},
+"A2.2":{theme:"My Country",units:[["GUNIT33","East Africa My Home","I can describe East Africa"],["GUNIT34","Coffee Farmers","I can talk about coffee"],["GUNIT35","Drums of East Africa","I can talk about culture"],["GUNIT36","My Town Arusha","I can describe town"],["GUNIT37","Helping My Community","I can talk about helping"],["GUNIT38","Animals in East Africa","I can talk about animals"],["GUNIT39","My Work Rules","I can talk about rules"],["GUNIT40","A Trip to Nairobi","I can tell travel story"]]},
+"B1.1":{theme:"My Story",units:[["GUNIT41","When I Was Young","I can tell story about past"],["GUNIT42","The Day I Learned to Swim","I can tell learning story"],["GUNIT43","My First Day at Work","I can talk about first day"],["GUNIT44","A Difficult Exam","I can talk about challenges"],["GUNIT45","Helping a Stranger","I can tell moral story"],["GUNIT46","My Role Model","I can describe role model"],["GUNIT47","A Dream I Had","I can talk about dreams"],["GUNIT48","Learning from Mistakes","I can talk about mistakes"]]},
+"B1.2":{theme:"Work & Money",units:[["GUNIT49","Small Business","I can talk about business"],["GUNIT50","My Work - John's Shop","I can talk about work"],["GUNIT51","Saving Money","I can talk about saving"],["GUNIT52","At the Bank","I can talk about bank"],["GUNIT53","Farming for Money","I can talk about farming"],["GUNIT54","Interview Practice","I can answer interview questions"],["GUNIT55","Online Work","I can talk about online work"],["GUNIT56","Budget for Family","I can make budget"]]},
+"B2.1":{theme:"Ideas & Opinions",units:[["GUNIT57","Should Phones Be Allowed?","I can give opinion"],["GUNIT58","Climate Change","I can talk about climate"],["GUNIT59","Education for Girls","I can argue for education"],["GUNIT60","Social Media","I can discuss social media"],["GUNIT61","Health and Food","I can talk about health"],["GUNIT62","My City vs Village","I can compare places"],["GUNIT63","A Book That Changed Me","I can talk about book"],["GUNIT64","Future of East Africa","I can talk about future"]]},
+"B2.2":{theme:"Leadership",units:[["GUNIT65","What Is Leadership?","I can define leadership"],["GUNIT66","Starting a Project","I can plan project"],["GUNIT67","Public Speaking","I can speak in public"],["GUNIT68","Solving Conflict","I can talk about peace"],["GUNIT69","Entrepreneur Story","I can tell entrepreneur story"],["GUNIT70","Technology in East Africa","I can talk about tech"],["GUNIT71","My Opinion Essay","I can write opinion"],["GUNIT72","Preparing for Exam","I can plan study"]]},
+"C1.1":{theme:"Critical Thinking",units:[["GUNIT73","Media Literacy","I can analyse media"],["GUNIT74","The Power of Language","I can discuss language"],["GUNIT75","Poverty and Solutions","I can discuss poverty"],["GUNIT76","History Matters","I can talk about history"],["GUNIT77","Women in Leadership","I can discuss gender"],["GUNIT78","Ethics and Honesty","I can discuss ethics"],["GUNIT79","Science and Innovation","I can talk about science"],["GUNIT80","Debate: Tradition vs Modern","I can debate"]]},
+"C1.2":{theme:"Global Citizen",units:[["GUNIT81","East Africa Community","I can talk about EAC"],["GUNIT82","Migration Stories","I can discuss migration"],["GUNIT83","Climate Justice","I can argue climate justice"],["GUNIT84","The Future of Work","I can talk about future work"],["GUNIT85","Writing a CV","I can write CV"],["GUNIT86","Negotiation","I can negotiate"],["GUNIT87","Presenting an Idea","I can present idea"],["GUNIT88","Global English","I can discuss Global English"]]},
+"C2.1":{theme:"Mastery",units:[["GUNIT89","Philosophy of Ubuntu","I can discuss Ubuntu"],["GUNIT90","Critical Essay: Development","I can write critical essay"],["GUNIT91","Storytelling as Power","I can analyse storytelling"],["GUNIT92","Research Skills","I can do research"],["GUNIT93","Leadership Speech","I can write speech"],["GUNIT94","Business Plan","I can write business plan"],["GUNIT95","Diplomacy","I can talk about diplomacy"],["GUNIT96","Teaching Others","I can teach"]]},
+"C2.2":{theme:"Legacy",units:[["GUNIT97","My Legacy","I can talk about legacy"],["GUNIT98","Writing a Book","I can plan a book"],["GUNIT99","Mentoring Youth","I can mentor"],["GUNIT100","Isomero Vision - EAC","I can present vision"],["GUNIT101","Global Speaker","I can speak globally"],["GUNIT102","Research Project","I can present research"],["GUNIT103","Building a School","I can plan a school"],["GUNIT104","Graduation Day","I can celebrate my graduation"]]}
+};
+let currentCourse="General English";
+let currentLevel="Pre-A1";
+let currentUnitId="GUNIT1";
+let currentUnitTitle="Hello, I Am Mary";
+let currentUnitDesc="I can say hello and my name";
+let savedKey=localStorage.getItem("isomero_key")||"";
+function findUnit(unitId){ for(let lvl in window.CURRICULUM){ for(let u of window.CURRICULUM[lvl].units){ if(u[0]===unitId) return {level:lvl,id:u[0],title:u[1],desc:u[2]}; } } return null; }
+function getScoreBadge(unitId){ let s=localStorage.getItem(unitId+"_score"); if(!s) return '<span class="score-badge score-none">Not done</span>'; let n=parseInt(s); if(n>=28) return '<span class="score-badge score-good">'+s+' ⭐</span>'; if(n>=20) return '<span class="score-badge score-mid">'+s+'</span>'; return '<span class="score-badge score-bad">'+s+'</span>'; }
+function openCourse(course){ currentCourse=course; if(course!=="General English"){ document.getElementById("courseHint").textContent="⚠️ "+course+" - Coming soon. Contact Admin on WhatsApp."; return; } document.getElementById("courseHint").textContent="✅ General English unlocked - Choose your level"; showLevels(); }
+function showLevels(){ let box=document.getElementById("unitsBox"); box.style.display="block"; document.getElementById("unitsTitle").textContent="General English - Choose Level"; document.getElementById("unitsSub").textContent="Pre-A1 to C2.2 - 13 Levels - 104 Units"; let html=""; for(let lvl in window.CURRICULUM){ html+=`<button onclick="showUnits('${lvl}')" style="background:#fff;color:#000;margin:4px 0">${lvl} - ${window.CURRICULUM[lvl].theme} (8 Units)</button>`; } document.getElementById("unitsList").innerHTML=html; box.scrollIntoView({behavior:"smooth"}); }
+function showUnits(level){ currentLevel=level; let data=window.CURRICULUM[level]; document.getElementById("unitsTitle").textContent="General English - "+level+" - "+data.theme; document.getElementById("unitsSub").textContent="8 Units - Tap to study, then Final Test"; let html=""; data.units.forEach((u)=>{ html+=`<div class="unit" onclick="openUnit('${u[0]}')"><div class="unum">${u[0].replace("GUNIT","U")}</div><div><b>${u[1]}</b><p>${u[2]}</p><button class="unit-btn btn-gold" onclick="event.stopPropagation();openUnit('${u[0]}')">📖 Study</button> <button class="unit-btn" style="background:#38bdf8;color:#000" onclick="event.stopPropagation();startFinalFor('${u[0]}')">📝 Final Test</button></div>${getScoreBadge(u[0])}</div>`; }); html+=`<button onclick="showLevels()" style="background:#1e2540;color:#fff;margin-top:8px">⬅️ Back to Levels</button>`; document.getElementById("unitsList").innerHTML=html; }
+function openUnit(unitId){ let u=findUnit(unitId); if(!u) return; currentUnitId=u.id; currentUnitTitle=u.title; currentUnitDesc=u.desc; document.getElementById("unitsBox").style.display="none"; let box=document.getElementById("unitDetailBox"); box.style.display="block"; document.getElementById("unitDetailTitle").textContent=u.id+" - "+u.title+" ("+u.level+")"; document.getElementById("unitDetailDesc").textContent=u.desc; box.scrollIntoView({behavior:"smooth"}); }
+function backToUnits(){ document.getElementById("unitDetailBox").style.display="none"; showUnits(currentLevel); }
+function speakUnit(){ speakMary("Hello! I am Mary. Today we learn: "+currentUnitTitle+". "+currentUnitDesc,'happy'); setTimeout(()=>{ speakJohn("Hello! I am John. Listen and repeat. "+currentUnitTitle+". "+currentUnitDesc,'calm'); },4000); }
+function startFinalFor(unitId){ currentUnitId=unitId; startFinalForCurrent(); }
+function startFinalForCurrent(){ if(typeof window.openFinalTest==="function"){ window.openFinalTest(currentUnitId); } else { alert("Loading Final Test... Wait 2 sec and try again. Make sure finaltests.js is loaded."); } }
+function checkKey(){ let k=document.getElementById("keyInput").value.trim().toUpperCase(); if(!k){ document.getElementById("keyMsg").textContent="⚠️ Enter your Key first"; return; } localStorage.setItem("isomero_key",k); if(window.__firebaseCheckKey){ window.__firebaseCheckKey(k); } else { unlockCourse(k,"Student","General English - Pre-A1"); } }
+function unlockCourse(key,name,info){ document.getElementById("keyBox").style.display="none"; document.getElementById("welcomeBox").style.display="block"; document.getElementById("welcomeName").textContent=name||"Student"; document.getElementById("welcomeInfo").textContent="Key: "+key+" • "+(info||"General English"); document.getElementById("keyMsg").textContent=""; document.querySelectorAll(".course").forEach(c=>c.classList.remove("locked")); document.getElementById("courseHint").textContent="✅ Unlocked! Tap General English to start."; updateMyScores(); }
+function logoutKey(){ localStorage.removeItem("isomero_key"); location.reload(); }
+function updateMyScores(){ let box=document.getElementById("myScoreBox"); if(!box) return; let done=0,totalScore=0,detail=""; for(let lvl in window.CURRICULUM){ for(let u of window.CURRICULUM[lvl].units){ let s=localStorage.getItem(u[0]+"_score"); if(s){ done++; totalScore+=parseInt(s); detail+=u[0]+": "+s+" • "; } } } if(done>0){ box.style.display="block"; document.getElementById("myScoreSummary").textContent=done+" units done - Total: "+totalScore+" points"; document.getElementById("myScoreDetail").textContent=detail; } }
+if(savedKey){ document.getElementById("keyInput").value=savedKey; }
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = { apiKey: "PASTE_NEW_KEY_HERE", authDomain: "isomero-f6887.firebaseapp.com", projectId: "isomero-f6887", storageBucket: "isomero-f6887.firebasestorage.app", messagingSenderId: "669743420568", appId: "1:669743420568:web:3b478914e4cd1525cd2ced" };
+let db=null;
+try{ const app=initializeApp(firebaseConfig); db=getFirestore(app); }catch(e){ console.log("Firebase offline",e); }
+window.__firebaseCheckKey = async (key)=>{
+  document.getElementById("keyMsg").textContent="⏳ Checking Key...";
+  if(!db){ unlockCourse(key,"Student","General English"); return; }
+  try{
+    const q=query(collection(db,"keys"), where("key","==",key));
+    const snap=await getDocs(q);
+    if(!snap.empty){ let d=snap.docs[0].data(); unlockCourse(key,d.name||"Student",(d.course||"General")+" - "+(d.level||"Pre-A1")); }
+    else { unlockCourse(key,"Student","General English - Pre-A1"); }
+  }catch(e){ unlockCourse(key,"Student","General English - Pre-A1"); }
+};
+</script>
+<script type="module" src="finaltests.js"></script>
+</body></html>
