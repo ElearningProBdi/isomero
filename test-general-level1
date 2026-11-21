@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISOMERO - Level 1 Test - Alison Style</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6fb;margin:0;padding:15px}
+.box{max-width:700px;margin:auto;background:white;padding:20px;border-radius:15px}
+h1{color:#1a73e8;text-align:center;font-size:22px}
+#timer{text-align:center;font-weight:bold;color:red;font-size:18px}
+.q{margin:20px 0;padding:15px;background:#f9f9f9;border-radius:10px}
+.q p{font-weight:bold}
+label{display:block;padding:8px;margin:5px 0;background:white;border:1px solid #ddd;border-radius:8px}
+input[type=text]{width:95%;padding:10px;border-radius:8px;border:1px solid #ddd}
+select{width:100%;padding:10px;border-radius:8px;margin:5px 0}
+button{width:100%;padding:15px;background:#1a73e8;color:white;border:none;border-radius:10px;font-size:18px;font-weight:bold}
+.badge{font-size:12px;background:#e8f0fe;color:#1a73e8;padding:3px 8px;border-radius:20px}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>ISOMERO - General Level 1</h1>
+<p style="text-align:center">40 Questions - Alison Style - 40 Min</p>
+<div id="timer">Time: 40:00</div>
+<div id="quiz"></div>
+<button onclick="finishTest()">SUBMIT TEST</button>
+<div id="result"></div>
+</div>
+<script>
+// BANK with 5 Alison Types: mc, tf, mr, fill, match
+const BANK = [
+// TYPE 1: Multiple Choice - mc
+{type:"mc", q:"I ___ a student.", a:["am","is","are","be"], c:0},
+{type:"mc", q:"She ___ to school every day.", a:["go","goes","going","gone"], c:1},
+// TYPE 2: True/False - tf
+{type:"tf", q:"'She are happy' is correct English.", c:1}, // 0=True, 1=False
+// TYPE 3: Multiple Response - mr (pick all correct)
+{type:"mr", q:"Which are colours? Pick ALL correct.", a:["Red","Book","Blue","Table"], c:[0,2]},
+// TYPE 4: Fill in Blank - fill
+{type:"fill", q:"I ___ (am/is) from Burundi.", c:"am"},
+// TYPE 5: Matching - match
+{type:"match", q:"Match: I / You / He", pairs:[["I","am"],["You","are"],["He","is"]], options:["am","are","is"]},
+];
+</script>
+<script>
+// ===== PART 2: ENGINE - Picks 40 Random + Shows 5 Types =====
+let selected = [...BANK].sort(()=>Math.random()-0.5).slice(0,40);
+let quizDiv = document.getElementById("quiz");
+
+function render(){
+  quizDiv.innerHTML = "";
+  selected.forEach((item, i)=>{
+    let html = `<div class="q"><span class="badge">${item.type.toUpperCase()}</span><p>${i+1}. ${item.q}</p>`;
+    if(item.type==="mc"){
+      item.a.forEach((opt,j)=>{
+        html += `<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label>`;
+      });
+    }
+    if(item.type==="tf"){
+      html += `<label><input type="radio" name="q${i}" value="0"> True</label>
+               <label><input type="radio" name="q${i}" value="1"> False</label>`;
+    }
+    if(item.type==="mr"){
+      item.a.forEach((opt,j)=>{
+        html += `<label><input type="checkbox" name="q${i}" value="${j}"> ${opt}</label>`;
+      });
+    }
+    if(item.type==="fill"){
+      html += `<input type="text" id="q${i}" placeholder="Type your answer...">`;
+    }
+    if(item.type==="match"){
+      item.pairs.forEach((pair,k)=>{
+        html += `<div>${pair[0]} : <select id="q${i}_${k}"><option value="">--Choose--</option>${item.options.map(o=>`<option value="${o}">${o}</option>`).join("")}</select></div>`;
+      });
+    }
+    html += `</div>`;
+    quizDiv.innerHTML += html;
+  });
+}
+render();
+
+// TIMER - 40 MIN
+let timeLeft = 40*60;
+let timerEl = document.getElementById("timer");
+let timer = setInterval(()=>{
+  timeLeft--;
+  let m = Math.floor(timeLeft/60), s = timeLeft%60;
+  timerEl.textContent = `Time: ${m}:${s<10?"0"+s:s}`;
+  if(timeLeft<=0){ clearInterval(timer); finishTest(); }
+},1000);
+
+// SCORING - Alison Pass = 80% = 32/40
+function finishTest(){
+  clearInterval(timer);
+  let score = 0;
+  selected.forEach((item,i)=>{
+    if(item.type==="mc" || item.type==="tf"){
+      let sel = document.querySelector(`input[name="q${i}"]:checked`);
+      if(sel && parseInt(sel.value)===item.c) score++;
+    }
+    if(item.type==="mr"){
+      let checks = [...document.querySelectorAll(`input[name="q${i}"]:checked`)].map(e=>parseInt(e.value)).sort().join(",");
+      if(checks === [...item.c].sort().join(",")) score++;
+    }
+    if(item.type==="fill"){
+      let val = document.getElementById(`q${i}`).value.trim().toLowerCase();
+      if(val === item.c.toLowerCase()) score++;
+    }
+    if(item.type==="match"){
+      let ok = true;
+      item.pairs.forEach((pair,k)=>{
+        let v = document.getElementById(`q${i}_${k}`).value;
+        if(v !== pair[1]) ok = false;
+      });
+      if(ok) score++;
+    }
+  });
+  let percent = Math.round(score/selected.length*100);
+  let pass = percent >= 80 ? "PASS ✅" : "FAIL ❌ - Retake";
+  document.getElementById("result").style.display="block";
+  document.getElementById("result").innerHTML = `
+    <h2>${pass}</h2>
+    <h1>${score} / ${selected.length} = ${percent}%</h1>
+    <p>Alison Pass Mark: 80%</p>
+    <a href="https://wa.me/257XXXXXXXXX?text=${encodeURIComponent("Hello ISOMERO, I finished Level 1 Test. My score: "+score+"/"+selected.length+" = "+percent+"% - "+pass)}" target="_blank">
+    <button style="background:#25D366">SEND RESULT TO ISOMERO ON WHATSAPP</button></a>
+    <br><br><button onclick="location.reload()">RETAKE TEST (New 40 Questions)</button>
+  `;
+  window.scrollTo(0, document.getElementById("result").offsetTop);
+}
+</script>
+</body>
+</html>
