@@ -1,0 +1,42 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ISOMERO EAC - Login</title>
+<style>body{font-family:system-ui;background:#0a0e1f;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px}.box{background:#fff;color:#111;border-radius:16px;padding:28px;width:100%;max-width:380px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5)}input{width:100%;padding:12px;margin:6px 0;border:1px solid #e2e8f0;border-radius:12px;box-sizing:border-box;font-size:15px}button{width:100%;padding:14px;background:#2563eb;color:#fff;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer;margin-top:10px}a{color:#2563eb;text-decoration:none}</style></head><body>
+<div class="box"><div style="font-size:50px">🎓</div><h2 style="margin:10px 0 5px">ISOMERO EAC</h2><p style="color:#64748b;font-size:13px;margin:0 0 16px">Login with Staff Account<br>Arusha, Tanzania • 8 EAC Countries</p>
+<input id="email" type="email" placeholder="Staff Email" autocomplete="email">
+<input id="pass" type="password" placeholder="Password" autocomplete="current-password">
+<button onclick="login()">Login →</button>
+<p id="err" style="color:#ef4444;font-size:13px;display:none"></p>
+<p style="margin-top:16px;font-size:13px"><a href="index.html">← Back to Home</a> • <a href="app.html">Student App</a></p>
+<p style="font-size:11px;color:#94a3b8;margin-top:10px">If you forgot password, ask Super Admin to reset it in Firebase.</p></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// ✅ CORRECT CONFIG - Same as manage-users.html
+const firebaseConfig = { apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3tEX60jk", authDomain: "isomero-f6887.firebaseapp.com", projectId: "isomero-f6887", storageBucket: "isomero-f6887.firebasestorage.app", messagingSenderId: "669743420568", appId: "1:669743420568:web:3b478914e4cd1525cd2ced", measurementId: "G-0QJZTRLQPG" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+window.login = async function(){
+  const email=document.getElementById('email').value.trim();
+  const pass=document.getElementById('pass').value;
+  const err=document.getElementById('err');
+  err.style.display='none';
+  if(!email||!pass){ err.style.display='block'; err.textContent='Enter email + password'; return; }
+  try{
+    const cred = await signInWithEmailAndPassword(auth,email,pass);
+    // Check role
+    const snap = await getDoc(doc(db,'users',cred.user.uid));
+    if(!snap.exists()){
+      err.style.display='block'; err.textContent='⚠️ No Role yet. Ask Super Admin to give you a role in admin.html';
+      return;
+    }
+    const role = snap.data().role;
+    if(role==='super_admin' || role==='admin' || role==='leader' || role==='teacher'){
+      window.location.href="manage-users.html";
+    } else {
+      window.location.href="app.html";
+    }
+  }catch(e){ err.style.display='block'; err.textContent=e.message; }
+}
+document.getElementById('pass').addEventListener('keydown', e=>{ if(e.key==='Enter') window.login(); });
+</script></body></html>
