@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ISOMERO - Student App</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:12px;background:#f6f7fb}
+.top{background:linear-gradient(90deg,#1a73e8,#673ab7);color:#fff;padding:20px;border-radius:18px;text-align:center}
+.card{background:#fff;border-radius:18px;padding:18px;margin:12px 0;border:1px solid #eee}
+.btn{border:0;padding:14px 20px;border-radius:999px;font-weight:800;font-size:16px;cursor:pointer;color:#fff;width:100%;margin:6px 0}
+.btn-blue{background:#1a73e8}.btn-green{background:#0d652d}
+input{width:100%;padding:14px;font-size:16px;border:2px solid #ddd;border-radius:12px;margin:6px 0}
+.hidden{display:none}.small{font-size:13px;color:#666;text-align:center}
+.lesson{background:#f6f7fb;border-radius:14px;padding:14px;margin:10px 0}
+</style></head>
+<body>
+<div class="top"><h1 style="margin:0">🌍 ISOMERO</h1><p style="margin:6px 0 0">Learn English • Mary & John • ElearningProBi • Bujumbura</p></div>
+
+<div class="card" id="loginCard">
+<h2 style="margin:0;text-align:center">🔑 Enter Your Key</h2>
+<p class="small">Enter the Key your Teacher gave you on WhatsApp</p>
+<input id="keyInput" placeholder="ISOMERO-1234" style="text-transform:uppercase;text-align:center;font-weight:800;font-size:20px">
+<input id="nameInput" placeholder="Your Name - Ex: Mary Niyonsaba">
+<button class="btn btn-blue" onclick="studentLogin()">🚀 Start Learning</button>
+<p class="small" id="loginMsg"></p>
+<p class="small">Don't have a key? Ask your Teacher on WhatsApp<br>Demo Key for test: <b>ISOMERO-1234</b> + Name: <b>Test</b></p>
+</div>
+
+<div id="learnCard" class="hidden">
+<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+<div><b>👋 Hello <span id="studentNameShow"></span>!</b><br><span class="small">Key: <span id="studentKeyShow"></span> • XP: <span id="xpShow">0</span></span></div>
+<button class="btn btn-blue" onclick="studentLogout()" style="width:auto;padding:8px 14px;font-size:13px">Logout</button>
+</div>
+<div class="card">
+<h2 style="margin:0">📚 Unit 1: Greetings - Mary & John</h2>
+<div class="lesson"><b>Mary:</b> Hello John! How are you?<br><b>John:</b> I'm fine, thank you! And you?<br><b>Mary:</b> I'm great! Welcome to ISOMERO!</div>
+<p><b>🎤 Speak:</b> Say "Hello, how are you?" out loud!</p>
+<p><b>✍️ Write:</b> I am ___ (your name). I am from Bujumbura.</p>
+<button class="btn btn-green" onclick="completeLesson()">✅ I Finished Lesson 1 - Get +100 XP</button>
+<p class="small" id="lessonMsg"></p>
+</div>
+<div class="card">
+<h2 style="margin:0">📚 Unit 2: At School</h2>
+<div class="lesson"><b>Teacher:</b> What is your name?<br><b>Student:</b> My name is Mary.<br><b>Teacher:</b> Where are you from?<br><b>Student:</b> I am from Burundi.</div>
+<button class="btn btn-green" onclick="completeLesson()">✅ I Finished Lesson 2 - Get +100 XP</button>
+</div>
+<div class="card">
+<h2 style="margin:0">📚 Unit 3: At the Market</h2>
+<div class="lesson"><b>Mary:</b> How much is this mango?<br><b>John:</b> It's 1000 francs.<br><b>Mary:</b> Thank you!</div>
+<button class="btn btn-green" onclick="completeLesson()">✅ I Finished Lesson 3 - Get +100 XP</button>
+</div>
+</div>
+<p class="small">© 2026 ISOMERO • Teacher: baracyriaque@yahoo.com</p>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3tEX60jk", authDomain: "isomero-f6887.firebaseapp.com", projectId: "isomero-f6887", storageBucket: "isomero-f6887.appspot.com", messagingSenderId: "669743420568", appId: "1:669743420568:web:3b478914e4cd1525cd2ced" };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+window.__db=db; window.__getDocs=getDocs; window.__collection=collection; window.__addDoc=addDoc; window.__serverTimestamp=serverTimestamp;
+</script>
+<script>
+let xp = parseInt(localStorage.getItem('isomero_xp')||'0');
+function updateXP(){ document.getElementById('xpShow').innerText=xp; }
+window.studentLogin = async function(){
+  let key = document.getElementById('keyInput').value.trim().toUpperCase();
+  let name = document.getElementById('nameInput').value.trim();
+  if(!key || !name){ document.getElementById('loginMsg').innerText='⚠️ Enter Key + Name'; return; }
+  document.getElementById('loginMsg').innerText='⏳ Checking key...';
+  if(key==='ISOMERO-1234'){ openLearn(key,name); return; }
+  if(!key.startsWith('ISOMERO-')){ document.getElementById('loginMsg').innerText='❌ Key must start with ISOMERO-'; return; }
+  try{
+    let snap = await window.__getDocs(window.__collection(window.__db,'keys'));
+    let found=null;
+    snap.forEach(d=>{ let k=d.data(); if(k.key && k.key.toUpperCase()===key) found=k; });
+    if(found){ openLearn(key,name); return; }
+    else {
+      try{ await window.__addDoc(window.__collection(window.__db,'keys'),{key:key,studentName:name,school:'ISOMERO',course:'General English',active:true,createdAt:window.__serverTimestamp()}); }catch(e){}
+      openLearn(key,name); return;
+    }
+  }catch(e){
+    openLearn(key,name); return;
+  }
+};
+function openLearn(key,name){
+  localStorage.setItem('isomero_key',key);
+  localStorage.setItem('isomero_name',name);
+  document.getElementById('loginCard').classList.add('hidden');
+  document.getElementById('learnCard').classList.remove('hidden');
+  document.getElementById('studentNameShow').innerText=name;
+  document.getElementById('studentKeyShow').innerText=key;
+  updateXP();
+}
+window.studentLogout = function(){ localStorage.removeItem('isomero_key'); location.reload(); };
+window.completeLesson = async function(){
+  xp+=100; localStorage.setItem('isomero_xp',xp); updateXP();
+  let key=localStorage.getItem('isomero_key'); let name=localStorage.getItem('isomero_name');
+  document.getElementById('lessonMsg').innerText='🎉 +100 XP! Total: '+xp+' XP';
+  try{ await window.__addDoc(window.__collection(window.__db,'scores'),{key:key,studentName:name,unitId:'Unit 1',score:10,total:10,percent:100,points:100,createdAt:window.__serverTimestamp()}); }catch(e){}
+};
+window.onload = function(){
+  let k=localStorage.getItem('isomero_key'); let n=localStorage.getItem('isomero_name');
+  if(k && n){ openLearn(k,n); }
+};
+</script>
+</body></html>
