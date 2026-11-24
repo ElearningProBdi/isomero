@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISOMERO - Test</title>
+<script src="js/gunits.js"></script>
+<script src="js/bunits.js"></script>
+<script src="js/lunits.js"></script>
+<script src="js/munits.js"></script>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6fb;margin:0;padding:15px}
+.box{max-width:700px;margin:auto;background:white;padding:20px;border-radius:15px}
+h1{color:#1a73e8;text-align:center;font-size:22px}
+#timer{text-align:center;font-weight:bold;color:red;font-size:18px}
+.q{margin:20px 0;padding:15px;background:#f9f9f9;border-radius:10px}
+.q p{font-weight:bold}
+label{display:block;padding:8px;margin:5px 0;background:white;border:1px solid #ddd;border-radius:8px;cursor:pointer}
+input[type=text]{width:95%;padding:10px;border-radius:8px;border:1px solid #ddd}
+select{width:100%;padding:10px;border-radius:8px;margin:5px 0}
+button{width:100%;padding:15px;background:#1a73e8;color:white;border:none;border-radius:10px;font-size:18px;font-weight:bold;cursor:pointer;margin:8px 0}
+.badge{font-size:12px;background:#e8f0fe;color:#1a73e8;padding:3px 8px;border-radius:20px}
+.pass{background:#e8f5e9;border:2px solid #0d652d;padding:16px;border-radius:12px;text-align:center}
+.fail{background:#ffebee;border:2px solid #c62828;padding:16px;border-radius:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="box">
+<h1 id="testTitle">ISOMERO - Test</h1>
+<p style="text-align:center" id="testSub">40 Questions - 40 Min - Pass: 80%</p>
+<div id="timer">Time: 40:00</div>
+<div id="quiz"></div>
+<button onclick="finishTest()">SUBMIT TEST</button>
+<div id="result" style="display:none"></div>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3tEX60jk", authDomain: "isomero-f6887.firebaseapp.com", projectId: "isomero-f6887", storageBucket: "isomero-f6887.firebasestorage.app", messagingSenderId: "669743420568", appId: "1:669743420568:web:3b478914e4cd1525cd2ced", measurementId: "G-0QJZTRLQPG" };
+const app = initializeApp(firebaseConfig); const db = getFirestore(app);
+window.__db = db; window.__addDoc = addDoc; window.__collection = collection; window.__serverTimestamp = serverTimestamp;
+</script>
+<script>
+function getParam(k){ return new URLSearchParams(window.location.search).get(k); }
+let COURSE = (getParam('course')||'general').toLowerCase();
+let LEVEL_IDX = Math.min(13, Math.max(1, parseInt(getParam('level')||'1')||1));
+let MAP = {
+  general:{bible:()=>window.ISOMERO_DATA, prefix:'gunit', short:'G', name:'General English'},
+  business:{bible:()=>window.ISOMERO_BUNITS_DATA, prefix:'bunit', short:'B', name:'Business English'},
+  legal:{bible:()=>window.ISOMERO_LUNITS_DATA, prefix:'lunit', short:'L', name:'Legal English'},
+  medical:{bible:()=>window.ISOMERO_MUNITS_DATA, prefix:'munit', short:'M', name:'Medical English'}
+};
+let CFG = MAP[COURSE] || MAP.general;
+let LEVELS = ["Pre-A1","A1.1","A1.2","A2.1","A2.2","B1.1","B1.2","B2.1","B2.2","C1.1","C1.2","C2.1","C2.2"];
+let LEVEL_NAME = LEVELS[LEVEL_IDX-1];
+let BIBLE = CFG.bible();
+let UNITS = [];
+if(BIBLE && BIBLE.levels){
+  let lv = BIBLE.levels.find(l=>l.level===LEVEL_NAME) || BIBLE.levels[LEVEL_IDX-1];
+  if(lv) UNITS = lv.units || [];
+}
+// Fallback si pas de data
+if(!UNITS.length){
+  UNITS = [{title:'Hello, I Am Mary', canDo:'I can say hello and my name', dialoguePlace:'EAC Youth Forum', vocab:['Hello','Name','Happy','Friend','Meet'], grammar:'I am Mary.'}];
+}
+document.getElementById('testTitle').innerText = 'ISOMERO - '+CFG.name+' - '+LEVEL_NAME+' - Level '+LEVEL_IDX;
+document.getElementById('testSub').innerText = '40 Questions from 8 Units • '+UNITS.map(u=>u.title).slice(0,3).join(' / ')+'... • 40 Min • Pass: 80%';
+
+// ===== BUILD 40 QUESTIONS FROM UNITS =====
+function shuffle(a){ return [...a].sort(()=>Math.random()-0.5); }
+let BANK = [];
+// Pour chaque unité, on crée 5 questions = 8 x 5 = 40
+UNITS.slice(0,8).forEach((u, ui)=>{
+  let v = u.vocab || ['Hello'];
+  let v0 = v[0]||'Hello', v1 = v[1]||v0, v2 = v[2]||v0;
+  // 1 - MC: Title
+  BANK.push({type:"mc", q:"Unit "+(ui+1)+": What is the title?", a:shuffle([u.title, "Wrong Title", "Where is Mama?", "My School"]), c:0});
+  // Fix c après shuffle: on recalcule
+  BANK[BANK.length-1].c = BANK[BANK.length-1].a.indexOf(u.title);
+  // 2 - MC: Can Do
+  let opts2 = shuffle([u.canDo, "I cannot speak", "I can fly", "I can swim"]);
+  BANK.push({type:"mc", q:"Unit "+(ui+1)+": What is the Can Do? - "+u.title, a:opts2, c:opts2.indexOf(u.canDo)});
+  // 3 - TF: Vocab vrai
+  BANK.push({type:"tf", q:"'"+v0+"' is a word in '"+u.title+"'.", c:0});
+  // 4 - MR: Vocab du lesson
+  let mrOpts = shuffle([v0, v1, "Elephant", "Banana"]);
+  BANK.push({type:"mr", q:"Which words are in '"+u.title+"'? Pick ALL correct.", a:mrOpts, c:[mrOpts.indexOf(v0), mrOpts.indexOf(v1)].sort()});
+  // 5 - FILL ou MATCH
+  if(ui % 2 === 0){
+    BANK.push({type:"fill", q:"Type the first vocab word of '"+u.title+"': ___", c:v0.toLowerCase()});
+  } else {
+    BANK.push({type:"match", q:"Match vocab for '"+u.title+"'", pairs:[[v0, v0],[v1, v1],[v2, v2]], options:shuffle([v0,v1,v2])});
+    // Pour match, pairs = [label, bonne réponse]
+    BANK[BANK.length-1].pairs = [[v0, v0],[v1, v1],[v2, v2]];
+  }
+});
+// Si moins de 40 (ex: moins de 8 unités), on complète avec grammaire
+while(BANK.length < 40){
+  let u = UNITS[BANK.length % UNITS.length];
+  let v = (u.vocab||['Hello'])[0];
+  let opts = shuffle([v, "Elephant", "Banana", "Table"]);
+  BANK.push({type:"mc", q:"Which word is in '"+u.title+"'? - Grammar: "+u.grammar, a:opts, c:opts.indexOf(v)});
+}
+BANK = BANK.slice(0,40);
+
+let selected = [...BANK];
+let quizDiv = document.getElementById("quiz");
+function render(){
+  quizDiv.innerHTML = "";
+  selected.forEach((item, i)=>{
+    let html = `<div class="q"><span class="badge">${item.type.toUpperCase()}</span><p>${i+1}. ${item.q}</p>`;
+    if(item.type==="mc"){
+      item.a.forEach((opt,j)=>{ html += `<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label>`; });
+    }
+    if(item.type==="tf"){
+      html += `<label><input type="radio" name="q${i}" value="0"> True</label><label><input type="radio" name="q${i}" value="1"> False</label>`;
+    }
+    if(item.type==="mr"){
+      item.a.forEach((opt,j)=>{ html += `<label><input type="checkbox" name="q${i}" value="${j}"> ${opt}</label>`; });
+    }
+    if(item.type==="fill"){ html += `<input type="text" id="q${i}" placeholder="Type your answer...">`; }
+    if(item.type==="match"){
+      item.pairs.forEach((pair,k)=>{ html += `<div>${pair[0]} : <select id="q${i}_${k}"><option value="">--Choose--</option>${item.options.map(o=>`<option value="${o}">${o}</option>`).join("")}</select></div>`; });
+    }
+    html += `</div>`;
+    quizDiv.innerHTML += html;
+  });
+}
+render();
+let timeLeft = 40*60;
+let timerEl = document.getElementById("timer");
+let timer = setInterval(()=>{
+  timeLeft--;
+  let m = Math.floor(timeLeft/60), s = timeLeft%60;
+  timerEl.textContent = `Time: ${m}:${s<10?"0"+s:s}`;
+  if(timeLeft<=0){ clearInterval(timer); finishTest(); }
+},1000);
+
+async function finishTest(){
+  clearInterval(timer);
+  let score = 0;
+  selected.forEach((item,i)=>{
+    if(item.type==="mc" || item.type==="tf"){
+      let sel = document.querySelector(`input[name="q${i}"]:checked`);
+      if(sel && parseInt(sel.value)===item.c) score++;
+    }
+    if(item.type==="mr"){
+      let checks = [...document.querySelectorAll(`input[name="q${i}"]:checked`)].map(e=>parseInt(e.value)).sort().join(",");
+      if(checks === [...item.c].sort().join(",")) score++;
+    }
+    if(item.type==="fill"){
+      let val = document.getElementById(`q${i}`).value.trim().toLowerCase();
+      if(val === String(item.c).toLowerCase()) score++;
+    }
+    if(item.type==="match"){
+      let ok = true;
+      item.pairs.forEach((pair,k)=>{
+        let v = document.getElementById(`q${i}_${k}`).value;
+        if(v !== pair[1]) ok = false;
+      });
+      if(ok) score++;
+    }
+  });
+  let percent = Math.round(score/selected.length*100);
+  let pass = percent >= 80;
+  let studentName = localStorage.getItem('isomero_name') || 'Student';
+  let key = localStorage.getItem('isomero_key') || 'NO-KEY';
+  // Sauvegarde Firebase
+  try{
+    if(window.__addDoc){
+      await window.__addDoc(window.__collection(window.__db,'testScores'),{key:key, studentName:studentName, course:CFG.name, level:LEVEL_NAME, levelIndex:LEVEL_IDX, score:score, total:selected.length, percent:percent, passed:pass, createdAt:window.__serverTimestamp()});
+    }
+  }catch(e){}
+  // Débloque niveau suivant si PASS
+  if(pass){
+    localStorage.setItem('isomero_level_done_'+CFG.prefix+'_level'+LEVEL_IDX,'yes');
+    localStorage.setItem('isomero_test_passed_'+CFG.prefix+LEVEL_IDX,'yes');
+  }
+  let resultDiv = document.getElementById("result");
+  resultDiv.style.display="block";
+  let certLink = 'certificate.html?course='+COURSE+'&level='+LEVEL_IDX+'&score='+percent+'&name='+encodeURIComponent(studentName);
+  let nextLink = 'unit.html?course='+COURSE+'&n='+(LEVEL_IDX*8+1);
+  let homeLink = 'index.html';
+  if(pass){
+    resultDiv.innerHTML = `
+    <div class="pass"><h2>PASS ✅ - ${percent}%</h2><h1>${score} / ${selected.length} = ${percent}%</h1><p>${CFG.name} - ${LEVEL_NAME} - Level ${LEVEL_IDX}</p>
+    <a href="${certLink}"><button style="background:#0d652d">🎓 GET MY CERTIFICATE</button></a>
+    <a href="${nextLink}"><button style="background:#ff9800">➡️ NEXT LEVEL - Unit ${LEVEL_IDX*8+1}</button></a>
+    <a href="${homeLink}"><button style="background:#1e2540">🏠 Back Home</button></a></div>`;
+  } else {
+    resultDiv.innerHTML = `
+    <div class="fail"><h2>FAIL ❌ - ${percent}% - Need 80%</h2><h1>${score} / ${selected.length} = ${percent}%</h1><p>Review the 8 Units and try again.</p>
+    <a href="https://wa.me/25762706404?text=${encodeURIComponent("Hello ISOMERO, I finished "+CFG.name+" "+LEVEL_NAME+" Test. My score: "+score+"/"+selected.length+" = "+percent+"%")}"><button style="background:#25D366">SEND RESULT TO WHATSAPP</button></a>
+    <br><button onclick="location.reload()">RETAKE TEST</button></div>`;
+  }
+  window.scrollTo(0, resultDiv.offsetTop);
+}
+</script>
+</body>
+</html>
