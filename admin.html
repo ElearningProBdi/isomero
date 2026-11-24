@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISOMERO - Admin</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0a0e1f;color:white;margin:0;padding:15px}
+.box{max-width:900px;margin:auto}
+h1{text-align:center;color:#ffcc00}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.tabs button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:800;cursor:pointer;background:#1e2540;color:white;min-width:110px}
+.tabs button.active{background:#ffcc00;color:#000}
+.card{background:white;color:#111;border-radius:14px;padding:14px;margin:10px 0}
+.card b{font-size:15px}
+.card p{margin:4px 0;color:#64748b;font-size:13px}
+.pill{display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:800;background:#fef9c3}
+.pill.green{background:#dcfce7;color:#166534}
+.pill.red{background:#fee2e2;color:#991b1b}
+.pill.blue{background:#dbeafe;color:#1e40af}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin:6px 0;font-size:15px;box-sizing:border-box}
+button.main{width:100%;padding:14px;background:#ffcc00;color:#000;border:none;border-radius:10px;font-weight:800;font-size:16px;cursor:pointer}
+.stat{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:12px 0}
+.stat div{background:#1e2540;border-radius:12px;padding:12px;text-align:center}
+.stat b{font-size:22px;display:block;color:#ffcc00}
+.stat span{font-size:12px;color:#cbd5e1}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>🛠️ ISOMERO - Admin</h1>
+<p style="text-align:center;color:#cbd5e1">Bujumbura • EAC • <a href="index.html" style="color:#ffcc00">Home</a> • <a href="manage-users.html" style="color:#ffcc00">Manage Users</a></p>
+
+<div class="stat">
+  <div><b id="statKeys">-</b><span>Keys</span></div>
+  <div><b id="statScores">-</b><span>Scores</span></div>
+  <div><b id="statTests">-</b><span>Tests</span></div>
+  <div><b id="statCerts">-</b><span>Certificates</span></div>
+</div>
+
+<div style="display:flex;gap:8px">
+  <input id="searchInput" placeholder="🔍 Search by Name, Key, Course...">
+  <button onclick="loadAll()" style="padding:12px 16px;background:#1e2540;color:white;border:none;border-radius:10px;font-weight:800;cursor:pointer">🔄</button>
+</div>
+
+<div class="tabs">
+  <button id="tabKeys" class="active" onclick="showTab('keys')">🔑 Keys</button>
+  <button id="tabScores" onclick="showTab('scores')">⭐ Scores</button>
+  <button id="tabTests" onclick="showTab('tests')">📝 Tests</button>
+  <button id="tabCerts" onclick="showTab('certs')">🎓 Certificates</button>
+</div>
+
+<div id="list"><p style="text-align:center;color:#cbd5e1">⏳ Loading...</p></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3tEX60jk", authDomain: "isomero-f6887.firebaseapp.com", projectId: "isomero-f6887", storageBucket: "isomero-f6887.firebasestorage.app", messagingSenderId: "669743420568", appId: "1:669743420568:web:3b478914e4cd1525cd2ced", measurementId: "G-0QJZTRLQPG" };
+const app = initializeApp(firebaseConfig); const db = getFirestore(app);
+
+let ALL = { keys:[], scores:[], tests:[], certs:[] };
+let CURRENT = 'keys';
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(ts){
+  if(!ts) return '-';
+  try{ let d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }catch(e){ return '-'; }
+}
+function filterList(arr, fields){
+  let q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
+  if(!q) return arr;
+  return arr.filter(x=> fields.some(f=> String(x[f]||'').toLowerCase().includes(q)));
+}
+function render(){
+  let box = document.getElementById('list');
+  let q = document.getElementById('searchInput').value||'';
+  let html = '';
+  if(CURRENT==='keys'){
+    let list = filterList(ALL.keys, ['key','studentName','name','course','level','phone']);
+    if(!list.length) html = '<p style="text-align:center">No keys found. Create in Manage Users.</p>';
+    list.forEach(k=>{
+      let expired = k.expiresAt ? (new Date(k.expiresAt) < new Date()) : false;
+      let name = esc(k.studentName||k.name||'-');
+      html += `<div class="card"><b>🔑 ${esc(k.key||k.id)} - ${name}</b> <span class="pill ${k.revoked?'red':expired?'red':'green'}">${k.revoked?'REVOKED':expired?'EXPIRED':'ACTIVE'}</span><p>Course: ${esc(k.course||'')} • Level: ${esc(k.level||'')} • Phone: ${esc(k.phone||'')} • Country: ${esc(k.country||'')}</p><p>Expires: ${esc(k.expiresAt||k.expiry||'-')} • Used: ${k.used?'Yes ✅':'No'} • Created: ${fmtDate(k.createdAt)}</p><a href="https://wa.me/${String(k.phone||'').replace(/\D/g,'')}?text=${encodeURIComponent('Hello '+name+', your ISOMERO key: '+(k.key||''))}" target="_blank"><button style="padding:8px 12px;background:#25D366;color:white;border:none;border-radius:8px;font-weight:800;cursor:pointer">💬 WhatsApp</button></a></div>`;
+    });
+  }
+  if(CURRENT==='scores'){
+    let list = filterList(ALL.scores, ['name','key','course']);
+    list.sort((a,b)=>(b.xp||0)-(a.xp||0));
+    list.forEach((s,i)=>{
+      let medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+      html += `<div class="card"><b>${medal} ${esc(s.name)} - ⭐ ${s.xp} XP</b> <span class="pill blue">🔥 ${s.streak||1} days</span><p>Course: ${esc(s.course)} • Key: ${esc(s.key)} • Updated: ${fmtDate(s.updatedAt)}</p></div>`;
+    });
+    if(!list.length) html='<p style="text-align:center">No scores yet.</p>';
+  }
+  if(CURRENT==='tests'){
+    let list = filterList(ALL.tests, ['studentName','name','key','course','level']);
+    list.forEach(t=>{
+      html += `<div class="card"><b>${esc(t.studentName||t.name)} - ${esc(t.course)} ${esc(t.level)}</b> <span class="pill ${t.passed?'green':'red'}">${t.passed?'PASS ✅':'FAIL ❌'} ${t.percent}%</span><p>Score: ${t.score}/${t.total} = ${t.percent}% • Key: ${esc(t.key)} • ${fmtDate(t.createdAt)}</p></div>`;
+    });
+    if(!list.length) html='<p style="text-align:center">No tests yet.</p>';
+  }
+  if(CURRENT==='certs'){
+    let list = filterList(ALL.certs, ['studentName','name','key','course','level','verifyCode']);
+    list.forEach(c=>{
+      html += `<div class="card"><b>🎓 ${esc(c.studentName||c.name)} - ${esc(c.course)} ${esc(c.level)}</b> <span class="pill green">${c.percent}% PASS</span><p>Code: <b style="font-family:monospace">${esc(c.verifyCode)}</b> • Key: ${esc(c.key)} • ${fmtDate(c.createdAt)}</p><a href="https://wa.me/25762706404?text=${encodeURIComponent('Verify Certificate: '+c.verifyCode+' - '+(c.studentName||c.name))}"><button style="padding:8px 12px;background:#25D366;color:white;border:none;border-radius:8px;font-weight:800">✅ Verify</button></a></div>`;
+    });
+    if(!list.length) html='<p style="text-align:center">No certificates yet. Students need 80% on a Test.</p>';
+  }
+  box.innerHTML = html;
+}
+window.showTab = function(t){
+  CURRENT=t;
+  ['keys','scores','tests','certs'].forEach(x=> document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active', x===t));
+  render();
+};
+document.getElementById('searchInput').addEventListener('input', render);
+window.loadAll = async function(){
+  document.getElementById('list').innerHTML = '<p style="text-align:center">⏳ Loading...</p>';
+  try{
+    let [kSnap, sSnap, tSnap, cSnap] = await Promise.all([
+      getDocs(query(collection(db,'enrolmentKeys'), orderBy('createdAt','desc'), limit(100))),
+      getDocs(query(collection(db,'scores'), orderBy('xp','desc'), limit(50))),
+      getDocs(query(collection(db,'testScores'), orderBy('createdAt','desc'), limit(100))),
+      getDocs(query(collection(db,'certificates'), orderBy('createdAt','desc'), limit(100)))
+    ]);
+    ALL.keys=[]; kSnap.forEach(d=>ALL.keys.push({id:d.id, ...d.data()}));
+    ALL.scores=[]; sSnap.forEach(d=>ALL.scores.push(d.data()));
+    ALL.tests=[]; tSnap.forEach(d=>ALL.tests.push(d.data()));
+    ALL.certs=[]; cSnap.forEach(d=>ALL.certs.push(d.data()));
+    document.getElementById('statKeys').innerText = ALL.keys.length;
+    document.getElementById('statScores').innerText = ALL.scores.length;
+    document.getElementById('statTests').innerText = ALL.tests.length;
+    document.getElementById('statCerts').innerText = ALL.certs.length;
+    render();
+  }catch(e){
+    document.getElementById('list').innerHTML = '<p style="text-align:center;color:#ffcc00">❌ Error: '+esc(e.message)+'<br>Check Firestore Rules.</p>';
+  }
+};
+loadAll();
+</script>
+</body>
+</html>
