@@ -1,0 +1,21 @@
+title: ISOMERO
+description: ISOMERO - Learn English - EAC
+baseurl: "/isomero"
+url: "https://elearningpro-eac.github.io"
+
+# Ne pas utiliser de theme, on utilise nos HTML
+theme: null
+plugins: []
+
+# Exclure ces fichiers du build
+exclude:
+    - node_modules
+    - Gemfile
+    - Gemfile.lock
+    - README.md
+
+# Garder nos fichiers
+include:
+    - "*.html"
+    - "*.css"
+    - "*.js"
