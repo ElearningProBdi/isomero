@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ISOMERO - Leader Dashboard</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;max-width:900px;margin:0 auto;padding:12px;background:#f6f7fb}
+.top{background:linear-gradient(90deg,#ff5722,#ff9800);color:#fff;padding:20px;border-radius:18px;text-align:center}
+.card{background:#fff;border-radius:18px;padding:18px;margin:12px 0;border:1px solid #eee;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+.btn{border:0;padding:11px 16px;border-radius:999px;font-weight:800;font-size:14px;cursor:pointer;color:#fff;margin:3px}
+.btn-green{background:#0d652d}.btn-purple{background:#673ab7}.btn-orange{background:#ff5722}.btn-blue{background:#1a73e8}.btn-red{background:#d32f2f}.btn-grey{background:#666}
+input,select{width:100%;padding:13px;font-size:16px;border:2px solid #ddd;border-radius:12px;margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{border:1px solid #eee;padding:8px;text-align:left}
+.hidden{display:none}.keyBox{background:#fff3e0;border:2px dashed #ff5722;padding:14px;border-radius:14px;text-align:center;font-size:20px;font-weight:800;margin:10px 0}
+.small{font-size:13px;color:#666;line-height:1.5}
+.badge{padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800;color:#fff}
+.badge-leader{background:#ff5722}.badge-teacher{background:#1a73e8}.badge-student{background:#0d652d}
+.stat{display:inline-block;background:#f6f7fb;border:1px solid #eee;border-radius:14px;padding:10px 14px;margin:4px;text-align:center;min-width:90px}.stat b{font-size:20px;display:block}
+</style></head>
+<body>
+<div class="top"><h1 style="margin:0">⭐ ISOMERO - LEADER</h1><p style="margin:6px 0 0">Chef d'École • Gère Teachers + Students de TON École</p></div>
+
+<div class="card" id="loginCard">
+<h2 style="margin:0">🔒 Leader Login - Par Clé</h2>
+<p class="small">Entre ta clé <b>LEADER-XXXXXX</b> que ton Super Leader / Super Admin t'a donnée + ton Nom.<br>Tu ne verras que TON École.</p>
+<input id="ldKey" placeholder="Ta Clé - Ex: LEADER-ABC123">
+<input id="ldName" placeholder="Ton Nom - Ex: Jean Nkurunziza">
+<button class="btn btn-orange" onclick="leaderLogin()">✅ Entrer dans mon École</button>
+<p class="small" id="loginMsg"></p>
+<p class="small">Pas de clé ? Demande à ton Super Leader ou Super Admin : Cyriaque - WhatsApp 25762706404</p>
+</div>
+
+<div id="mainCard" class="hidden">
+<div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+<div><b>👋 Bienvenue <span id="ldNameShow"></span></b><br><span class="small">École: <b id="ldSchoolShow"></b> • Zone: <b id="ldZoneShow"></b> • Clé: <span id="ldKeyShow"></span></span><br><span class="badge badge-leader">⭐ LEADER</span></div>
+<button class="btn btn-red" onclick="leaderLogout()" style="width:auto">🚪 Logout</button>
+</div>
+
+<div class="card"><div><span class="stat"><b id="statTotal">0</b>Total École</span><span class="stat"><b id="statTeacher">0</b>Teachers</span><span class="stat"><b id="statStudent">0</b>Students</span><span class="stat"><b id="statScores">0</b>Scores</span></div></div>
+
+<div class="card">
+<h2 style="margin:0">➕ Créer dans MON École</h2>
+<p class="small">Tu peux créer : <b>Teacher, Student</b> seulement. Tu ne peux PAS créer Leader, Super Leader, Admin.</p>
+<input id="userName" placeholder="Nom complet - Ex: Mary Niyonsaba">
+<input id="userPhone" placeholder="Phone WhatsApp - Ex: 25762706404">
+<label class="small"><b>🎭 RÔLE *</b></label>
+<select id="userRole"><option value="student">🎓 Student - Élève</option><option value="teacher">👨‍🏫 Teacher - Prof</option></select>
+<select id="userCourse"><option value="General English">General English</option><option value="Business English">Business English</option><option value="Legal English">Legal English</option><option value="Medical English">Medical English</option><option value="Kids English">Kids English</option></select>
+<select id="userLevel"><option value="Pre-A1">Pre-A1 - Level 1</option><option value="A1.1">A1.1 - Level 2</option><option value="A1.2">A1.2 - Level 3</option><option value="A2.1">A2.1 - Level 4</option><option value="A2.2">A2.2 - Level 5</option><option value="B1.1">B1.1 - Level 6</option><option value="B1.2">B1.2 - Level 7</option><option value="B2.1">B2.1 - Level 8</option><option value="B2.2">B2.2 - Level 9</option><option value="C1.1">C1.1 - Level 10</option><option value="C1.2">C1.2 - Level 11</option><option value="C2.1">C2.1 - Level 12</option><option value="C2.2">C2.2 - Level 13</option></select>
+<select id="userDuration"><option value="30">1 Month - 30 days</option><option value="90">3 Months - 90 days</option><option value="180">6 Months - 180 days</option><option value="365" selected>1 Year - 365 days</option><option value="9999">Lifetime - No expiry</option></select>
+<button class="btn btn-green" onclick="createUser()">✨ Créer + Générer Clé</button>
+<div id="newKeyBox" class="hidden"><div class="keyBox" id="newKeyText">KEY-XXXX</div><p style="text-align:center;margin:0"><b id="newUserName"></b> • <span id="newUserRole"></span></p><div style="background:#f6f7fb;padding:12px;border-radius:12px;font-size:14px;margin:10px 0" id="whatsappMsg"></div><button class="btn btn-green" onclick="copyWhatsApp()">📋 Copy WhatsApp</button><button class="btn btn-blue" onclick="sendWhatsApp()">💬 Send WhatsApp</button></div>
+<p class="small" id="genMsg"></p>
+</div>
+
+<div class="card">
+<h2 style="margin:0">👥 Mon École - <span id="schoolTitle"></span> <span id="userCount"></span></h2>
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"><button class="btn btn-grey" onclick="setFilter('all')">Tous</button><button class="btn btn-blue" onclick="setFilter('teacher')">👨‍🏫 Teachers</button><button class="btn btn-green" onclick="setFilter('student')">🎓 Students</button></div>
+<input id="searchInput" placeholder="🔍 Search nom, clé..." oninput="renderUsers()">
+<div id="usersList"></div>
+<div style="margin-top:10px"><button class="btn btn-orange" onclick="exportCSV()">📥 Export Excel (CSV)</button><button class="btn btn-blue" onclick="loadScores()">📊 Load Scores de mon École</button><button class="btn btn-grey" onclick="loadUsersFromFirebase()">☁️ Sync from Firebase</button></div>
+<p class="small" id="scoresMsg"></p><div id="scoresList"></div>
+</div>
+
+<div class="card"><h2 style="margin:0">🔗 Mes Liens</h2><p class="small"><b>Student App:</b><br><span id="studentLink"></span><br><button class="btn btn-blue" onclick="copyText(document.getElementById('studentLink').innerText)">📋 Copy Student Link</button></p></div>
+</div>
+<p style="text-align:center;font-size:12px;color:#888">© 2026 ISOMERO • EAC</p>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3tEX60jk", authDomain: "isomero-f6887.firebaseapp.com", projectId: "isomero-f6887", storageBucket: "isomero-f6887.firebasestorage.app", messagingSenderId: "669743420568", appId: "1:669743420568:web:3b478914e4cd1525cd2ced", measurementId: "G-0QJZTRLQPG" };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+window.__db=db; window.__doc=doc; window.__setDoc=setDoc; window.__getDoc=getDoc; window.__collection=collection; window.__getDocs=getDocs; window.__query=query; window.__orderBy=orderBy; window.__limit=limit; window.__serverTimestamp=serverTimestamp;
+</script>
+<script>
+let currentFilter='all'; let MY_ZONE=''; let MY_SCHOOL=''; let MY_KEY=''; let MY_NAME='';
+const ROLE_LABEL={leader:'⭐ LEADER',teacher:'👨‍🏫 TEACHER',student:'🎓 STUDENT'};
+const ROLE_CLASS={leader:'badge-leader',teacher:'badge-teacher',student:'badge-student'};
+function formatExp(v){ if(!v) return '-'; if(v==='Lifetime') return 'Lifetime'; if(!isNaN(v)&&String(v).length>=10) return new Date(Number(v)).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); return v; }
+function showLinks(){ let base=window.location.origin+window.location.pathname.replace('leader.html',''); document.getElementById('studentLink').innerText=base+'index.html'; }
+async function leaderLogin(){
+  let key=document.getElementById('ldKey').value.trim().toUpperCase();
+  let name=document.getElementById('ldName').value.trim();
+  if(!key||!name){document.getElementById('loginMsg').innerText='⚠️ Enter Clé + Nom';return;}
+  document.getElementById('loginMsg').innerText='⏳ Vérification avec Firebase...';
+  try{
+    let snap=await window.__getDoc(window.__doc(window.__db,'enrolmentKeys',key));
+    if(!snap.exists()){ document.getElementById('loginMsg').innerText='❌ Clé introuvable. Vérifie ta clé.'; return; }
+    let d=snap.data();
+    if(d.role!=='leader'){ document.getElementById('loginMsg').innerText='❌ Cette clé n’est pas Leader. Rôle: '+(d.role||'student'); return; }
+    if(d.revoked){ document.getElementById('loginMsg').innerText='❌ Cette clé a été révoquée.'; return; }
+    if(d.expiresAt!=='Lifetime' && d.expiresAt && Number(d.expiresAt)<Date.now()){ document.getElementById('loginMsg').innerText='❌ Clé expirée le '+formatExp(d.expiresAt); return; }
+    let dbName=(d.studentName||d.name||'').toLowerCase();
+    if(dbName && !dbName.includes(name.toLowerCase().split(' ')[0]) && !name.toLowerCase().includes(dbName.split(' ')[0])){ document.getElementById('loginMsg').innerText='❌ Nom ne correspond pas à cette clé. Essaie: '+d.studentName; return; }
+    MY_ZONE=d.zone||''; MY_SCHOOL=d.school||'ISOMERO'; MY_KEY=key; MY_NAME=d.studentName||name;
+    localStorage.setItem('isomero_leader', JSON.stringify({key:MY_KEY,name:MY_NAME,zone:MY_ZONE,school:MY_SCHOOL}));
+    openDashboard();
+  }catch(e){ document.getElementById('loginMsg').innerText='⚠️ Error: '+e.message; }
+}
+function openDashboard(){
+  document.getElementById('loginCard').classList.add('hidden');
+  document.getElementById('mainCard').classList.remove('hidden');
+  document.getElementById('ldNameShow').innerText=MY_NAME;
+  document.getElementById('ldSchoolShow').innerText=MY_SCHOOL;
+  document.getElementById('ldZoneShow').innerText=MY_ZONE;
+  document.getElementById('ldKeyShow').innerText=MY_KEY;
+  document.getElementById('schoolTitle').innerText=MY_SCHOOL;
+  showLinks(); renderUsers(); loadUsersFromFirebase();
+}
+function leaderLogout(){ localStorage.removeItem('isomero_leader'); location.reload(); }
+(function(){ try{ let s=JSON.parse(localStorage.getItem('isomero_leader')||'null'); if(s && s.key){ MY_KEY=s.key; MY_NAME=s.name; MY_ZONE=s.zone; MY_SCHOOL=s.school; setTimeout(openDashboard,300); } }catch(e){} })();
+function getUsers(){ try{return JSON.parse(localStorage.getItem('isomero_users_school')||'[]');}catch(e){return[];} }
+function saveUsers(l){ localStorage.setItem('isomero_users_school',JSON.stringify(l)); updateStats(); }
+function updateStats(){ let l=getUsers(); document.getElementById('statTotal').innerText=l.length; document.getElementById('statTeacher').innerText=l.filter(u=>(u.role||'student')==='teacher').length; document.getElementById('statStudent').innerText=l.filter(u=>(u.role||'student')==='student').length; }
+function genPrefix(course,role){ if(role==='teacher') return 'TEACHER'; if(course.startsWith('General')) return 'GENERAL'; if(course.startsWith('Business')) return 'BUSINESS'; if(course.startsWith('Legal')) return 'LEGAL'; if(course.startsWith('Medical')) return 'MEDICAL'; return 'ISOMERO'; }
+async function createUser(){
+  let name=document.getElementById('userName').value.trim();
+  let phone=document.getElementById('userPhone').value.trim().replace(/\s/g,'');
+  let role=document.getElementById('userRole').value;
+  let course=document.getElementById('userCourse').value;
+  let level=document.getElementById('userLevel').value;
+  let days=parseInt(document.getElementById('userDuration').value);
+  if(!name){document.getElementById('genMsg').innerText='⚠️ Enter name';return;}
+  if(!phone){document.getElementById('genMsg').innerText='⚠️ Enter phone';return;}
+  let chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let rand=''; for(let i=0;i<6;i++) rand+=chars[Math.floor(Math.random()*chars.length)];
+  let key=genPrefix(course,role)+'-'+rand;
+  document.getElementById('genMsg').innerText='⏳ Saving to Firebase...';
+  let expiresTs=days>=9999?'Lifetime':Date.now()+days*24*60*60*1000;
+  let expiresDisplay=expiresTs==='Lifetime'?'Lifetime':new Date(expiresTs).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  let user={key:key,name:name,studentName:name,phone:phone,school:MY_SCHOOL,zone:MY_ZONE,course:course,level:level,role:role,expiresAt:expiresTs,expiry:expiresDisplay,date:new Date().toLocaleDateString(),created:Date.now(),active:true};
+  let list=getUsers(); list.unshift(user); saveUsers(list);
+  try{
+    if(window.__db){
+      await window.__setDoc(window.__doc(window.__db,'enrolmentKeys',key),{key:key,studentName:name,name:name,phone:phone,school:MY_SCHOOL,zone:MY_ZONE,country:'Burundi',course:course,level:level,role:role,expiresAt:expiresTs,expiry:expiresDisplay,durationDays:days,used:false,revoked:false,createdBy:MY_KEY,createdByName:MY_NAME,createdAt:window.__serverTimestamp()});
+      await window.__setDoc(window.__doc(window.__db,'users',key),{key:key,name:name,phone:phone,school:MY_SCHOOL,zone:MY_ZONE,role:role,course:course,level:level,expiresAt:expiresTs,createdAt:window.__serverTimestamp()});
+    }
+    document.getElementById('genMsg').innerText='✅ '+ROLE_LABEL[role]+' créé dans '+MY_SCHOOL+'! Expires: '+expiresDisplay;
+  }catch(e){ document.getElementById('genMsg').innerText='✅ Saved on Phone (Firebase: '+e.message+')'; }
+  document.getElementById('newKeyBox').classList.remove('hidden');
+  document.getElementById('newKeyText').innerText=key;
+  document.getElementById('newUserName').innerText=name;
+  document.getElementById('newUserRole').innerText=ROLE_LABEL[role]+' • École: '+MY_SCHOOL;
+  let base=window.location.origin+window.location.pathname.replace('leader.html','');
+  document.getElementById('whatsappMsg').innerText='🌍 Hello '+name+'! Welcome to ISOMERO!\n\n🔑 Your Key: '+key+'\n👤 Name: '+name+'\n🎭 Your Role: '+ROLE_LABEL[role]+'\n🏫 School: '+MY_SCHOOL+'\n📍 Zone: '+MY_ZONE+'\n📚 Course: '+course+'\n📊 Level: '+level+'\n⏰ Expires: '+expiresDisplay+'\n\n👉 Start here:\n'+base+'index.html\n\nEnter your Key + Name and start! 👩👨';
+  document.getElementById('userName').value=''; document.getElementById('userPhone').value=''; renderUsers();
+}
+function copyWhatsApp(){ copyText(document.getElementById('whatsappMsg').innerText); alert('✅ Copied!'); }
+function sendWhatsApp(){ let txt=encodeURIComponent(document.getElementById('whatsappMsg').innerText); window.open('https://wa.me/?text='+txt,'_blank'); }
+function copyText(t){ navigator.clipboard.writeText(t); }
+function setFilter(f){ currentFilter=f; renderUsers(); }
+function renderUsers(){
+  let list=getUsers().filter(u=> !MY_SCHOOL || (u.school||'')===MY_SCHOOL);
+  let q=(document.getElementById('searchInput')?.value||'').toLowerCase();
+  let filtered=list.filter(u=>{ if(currentFilter!=='all' && (u.role||'student')!==currentFilter) return false; return ((u.name||'')+' '+u.key).toLowerCase().includes(q); });
+  document.getElementById('userCount').innerText='('+filtered.length+' / '+list.length+')'; updateStats();
+  if(!filtered.length){ document.getElementById('usersList').innerHTML='<p class="small">No users in your school yet. Crée ton premier Teacher / Student ci-dessus.</p>'; return; }
+  document.getElementById('usersList').innerHTML='<table><tr><th>Name / Role</th><th>Key</th><th>School</th><th>Action</th></tr>'+filtered.map(u=>{ let role=u.role||'student'; return '<tr><td><b>'+u.name+'</b><br><span class="badge '+ROLE_CLASS[role]+'">'+ROLE_LABEL[role]+'</span><br><span class="small">'+u.course+' • '+(u.level||'')+' • Exp: '+formatExp(u.expiresAt||u.expiry)+'</span></td><td><b>'+u.key+'</b></td><td>'+u.school+'<br><span class="small">📍 '+(u.zone||MY_ZONE)+' • '+(u.phone||'')+'</span></td><td><button class="btn btn-blue" style="padding:6px 10px;font-size:12px" onclick="copyText(\''+u.key+'\')">Copy</button></td></tr>'; }).join('')+'</table>';
+}
+function exportCSV(){
+  let list=getUsers();
+  let csv='Name,Key,Phone,School,Zone,Role,Course,Level,Expires,Date\n'+list.map(u=>'"'+u.name+'","'+u.key+'","'+(u.phone||'')+'","'+u.school+'","'+(u.zone||'')+'","'+(u.role||'')+'","'+u.course+'","'+(u.level||'')+'","'+formatExp(u.expiresAt)+'","'+u.date+'"').join('\n');
+  let blob=new Blob([csv],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='isomero-leader-'+MY_SCHOOL+'.csv'; a.click();
+}
+async function loadScores(){
+  document.getElementById('scoresMsg').innerText='⏳ Loading scores de ton école...';
+  try{
+    let snap=await window.__getDocs(window.__collection(window.__db,'scores'));
+    let rows=[]; snap.forEach(d=>{ let r=d.data(); if(!MY_SCHOOL || (r.school||'')===MY_SCHOOL) rows.push(r); });
+    rows.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    document.getElementById('statScores').innerText=rows.length;
+    if(!rows.length){ document.getElementById('scoresMsg').innerText='No scores yet in your school.'; return; }
+    document.getElementById('scoresMsg').innerText='✅ '+rows.length+' scores in '+MY_SCHOOL;
+    document.getElementById('scoresList').innerHTML='<table><tr><th>Student</th><th>Unit</th><th>Score</th><th>Points</th></tr>'+rows.slice(0,50).map(r=>'<tr><td>'+(r.studentName||r.name||'')+'<br><span class="small">'+(r.key||'')+'</span></td><td>'+(r.unitId||r.course||'')+'</td><td><b>'+(r.score||0)+'/'+(r.total||0)+' = '+(r.percent||0)+'%</b></td><td>'+(r.points||r.xp||0)+'</td></tr>').join('')+'</table>';
+  }catch(e){ document.getElementById('scoresMsg').innerText='⚠️ Error: '+e.message; }
+}
+async function loadUsersFromFirebase(){
+  document.getElementById('scoresMsg').innerText='⏳ Syncing ton école from Firebase...';
+  try{
+    let snap=await window.__getDocs(window.__query(window.__collection(window.__db,'enrolmentKeys'), window.__orderBy('createdAt','desc'), window.__limit(300)));
+    let list=getUsers(); let added=0;
+    snap.forEach(d=>{ let k=d.data(); if(k.key && !list.find(u=>u.key===k.key) && (!MY_SCHOOL || (k.school||'')===MY_SCHOOL) && ['teacher','student'].includes(k.role||'student')){ list.unshift({key:k.key,name:k.studentName||k.name||'Unknown',studentName:k.studentName||k.name||'Unknown',phone:k.phone||'',school:k.school||MY_SCHOOL,zone:k.zone||MY_ZONE,course:k.course||'General English',level:k.level||'',role:k.role||'student',expiresAt:k.expiresAt,expiry:k.expiry,date:new Date().toLocaleDateString(),created:Date.now(),active:!k.revoked}); added++; } });
+    saveUsers(list); renderUsers();
+    document.getElementById('scoresMsg').innerText='✅ Sync done! +'+added+' new users in '+MY_SCHOOL;
+  }catch(e){ document.getElementById('scoresMsg').innerText='⚠️ Error: '+e.message; }
+}
+</script>
+</body></html>
