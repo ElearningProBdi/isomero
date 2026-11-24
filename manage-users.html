@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISOMERO - Manage Users</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0a0e1f;color:white;margin:0;padding:15px}
+.box{max-width:900px;margin:auto}
+h1{text-align:center;color:#ffcc00}
+.card{background:white;color:#111;border-radius:14px;padding:16px;margin:12px 0}
+label{font-weight:800;font-size:13px;display:block;margin-top:10px}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin:6px 0;font-size:15px;box-sizing:border-box}
+button{width:100%;padding:14px;border:none;border-radius:10px;font-weight:800;font-size:16px;cursor:pointer;margin:6px 0}
+.btn-yellow{background:#ffcc00;color:#000}
+.btn-green{background:#25D366;color:white}
+.btn-blue{background:#1a73e8;color:white}
+.btn-red{background:#c62828;color:white}
+.btn-dark{background:#1e2540;color:white}
+.pill{display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:800}
+.pill.green{background:#dcfce7;color:#166534}
+.pill.red{background:#fee2e2;color:#991b1b}
+.pill.blue{background:#dbeafe;color:#1e40af}
+.keybox{background:#0a0e1f;color:#ffcc00;font-family:monospace;padding:12px;border-radius:10px;text-align:center;font-size:18px;letter-spacing:1px;margin:10px 0}
+</style>
+</head>
+<body>
+<!-- FIREBASE AUTH LOCK - START -->
+<div id="adminLock" style="position:fixed;inset:0;background:#0a0e1f;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="background:white;color:#111;border-radius:16px;padding:24px;max-width:380px;width:100%;text-align:center">
+    <h2 style="margin:0">🔒 ISOMERO ADMIN</h2>
+    <p style="color:#666">Connexion sécurisée Firebase</p>
+    <input id="adminEmail" type="email" placeholder="Email" value="baracyriaque@gmail.com" style="width:100%;padding:14px;border-radius:10px;border:1px solid #ddd;margin:10px 0;font-size:16px;box-sizing:border-box">
+    <input id="adminPass" type="password" placeholder="Mot de passe Firebase" style="width:100%;padding:14px;border-radius:10px;border:1px solid #ddd;margin:10px 0;font-size:16px;box-sizing:border-box">
+    <button id="loginBtn" style="width:100%;padding:14px;border:none;border-radius:10px;background:#ffcc00;font-weight:800;font-size:16px;cursor:pointer">SE CONNECTER</button>
+    <p id="passError" style="color:#c62828;font-weight:800;display:none;margin-top:10px"></p>
+    <p><a href="index.html" style="color:#1a73e8">← Back to Home</a></p>
+  </div>
+</div>
+<!-- FIREBASE AUTH LOCK - END -->
+<div class="box" id="adminContent" style="display:none">
+<h1>👥 ISOMERO - Manage Users</h1>
+<p style="text-align:center;color:#cbd5e1"><a href="index.html" style="color:#ffcc00">Home</a> • <a href="admin.html" style="color:#ffcc00">Admin</a> • Bujumbura • EAC • <a href="#" id="logoutLink" style="color:#ff6b6b">Logout</a></p>
+
+<!-- CREATE KEY -->
+<div class="card">
+<h2 style="margin:0">➕ Create New Key</h2>
+<label>Student Full Name *</label>
+<input id="studentName" placeholder="Ex: Mary Niyonkuru">
+<label>Phone (WhatsApp) *</label>
+<input id="phone" placeholder="Ex: 25762706404 ou +25762706404">
+<label>Country</label>
+<select id="country"><option value="Burundi">Burundi</option><option value="Rwanda">Rwanda</option><option value="Tanzania">Tanzania</option><option value="DRC">DRC</option><option value="Kenya">Kenya</option><option value="Uganda">Uganda</option><option value="South Sudan">South Sudan</option><option value="Other">Other</option></select>
+<label>Course *</label>
+<select id="course">
+  <option value="General English">General English</option>
+  <option value="Business English">Business English</option>
+  <option value="Legal English">Legal English</option>
+  <option value="Medical English">Medical English</option>
+</select>
+<label>Starting Level</label>
+<select id="level">
+  <option value="Pre-A1">Pre-A1 - Level 1</option><option value="A1.1">A1.1 - Level 2</option><option value="A1.2">A1.2 - Level 3</option><option value="A2.1">A2.1 - Level 4</option><option value="A2.2">A2.2 - Level 5</option><option value="B1.1">B1.1 - Level 6</option><option value="B1.2">B1.2 - Level 7</option><option value="B2.1">B2.1 - Level 8</option><option value="B2.2">B2.2 - Level 9</option><option value="C1.1">C1.1 - Level 10</option><option value="C1.2">C1.2 - Level 11</option><option value="C2.1">C2.1 - Level 12</option><option value="C2.2">C2.2 - Level 13</option>
+</select>
+<label>Duration / Expiration</label>
+<select id="duration">
+  <option value="30">1 Month - 30 days</option>
+  <option value="90">3 Months - 90 days</option>
+  <option value="180">6 Months - 180 days</option>
+  <option value="365" selected>1 Year - 365 days</option>
+  <option value="9999">Lifetime - No expiry</option>
+</select>
+<label>Payment (for your record only)</label>
+<input id="payment" placeholder="Ex: 50000 BIF - MTN MoMo - Paid">
+<button class="btn-yellow" onclick="createKey()">🔑 GENERATE KEY</button>
+<div id="newKeyBox" style="display:none">
+  <div class="keybox" id="newKeyVal">GENERAL-XXXX</div>
+  <button class="btn-green" id="waSendBtn">💬 SEND KEY ON WHATSAPP</button>
+  <button class="btn-blue" onclick="copyKey()">📋 COPY KEY</button>
+</div>
+<div id="createMsg" style="text-align:center;font-weight:800"></div>
+</div>
+
+<!-- SEARCH -->
+<div class="card">
+<h2 style="margin:0">🔍 Search Users</h2>
+<input id="searchInput" placeholder="Search by Name, Key, Phone, Course..." oninput="renderList()">
+</div>
+
+<div id="list"><p style="text-align:center">⏳ Loading users...</p></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, getDocs, query, orderBy, limit, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const firebaseConfig = { apiKey: "AIzaSyCAgHa3qAim81fVuAEjy6SDW8C3tEX60jk", authDomain: "isomero-f6887.firebaseapp.com", projectId: "isomero-f6887", storageBucket: "isomero-f6887.firebasestorage.app", messagingSenderId: "669743420568", appId: "1:669743420568:web:3b478914e4cd1525cd2ced", measurementId: "G-0QJZTRLQPG" };
+const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
+
+const ALLOWED_EMAIL = 'baracyriaque@gmail.com';
+
+onAuthStateChanged(auth, (user)=>{
+  if(user && user.email === ALLOWED_EMAIL){
+    document.getElementById('adminLock').style.display='none';
+    document.getElementById('adminContent').style.display='block';
+    loadUsers();
+  } else {
+    document.getElementById('adminLock').style.display='flex';
+    document.getElementById('adminContent').style.display='none';
+    if(user && user.email !== ALLOWED_EMAIL){ signOut(auth); }
+  }
+});
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const email = document.getElementById('adminEmail').value.trim();
+  const pass = document.getElementById('adminPass').value;
+  const err = document.getElementById('passError');
+  err.style.display='none';
+  if(email !== ALLOWED_EMAIL){ err.textContent='❌ Email non autorisé'; err.style.display='block'; return; }
+  try{ await signInWithEmailAndPassword(auth, email, pass); }
+  catch(e){ err.textContent='❌ '+e.message; err.style.display='block'; }
+});
+document.getElementById('adminPass').addEventListener('keypress',function(e){ if(e.key==='Enter') document.getElementById('loginBtn').click(); });
+document.getElementById('logoutLink').addEventListener('click', async (e)=>{ e.preventDefault(); await signOut(auth); });
+
+let ALL = [];
+let LAST_KEY = '', LAST_NAME='', LAST_PHONE='';
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function formatExp(v){
+  if(!v) return '-';
+  if(v==='Lifetime') return 'Lifetime';
+  if(!isNaN(v) && String(v).length>=10){
+    let d = new Date(Number(v));
+    return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  }
+  return v;
+}
+function isExpired(v){
+  if(!v || v==='Lifetime') return false;
+  if(!isNaN(v) && String(v).length>=10) return new Date(Number(v)) < new Date();
+  return new Date(v) < new Date();
+}
+function genKey(course){
+  let prefix = course.startsWith('General')?'GENERAL':course.startsWith('Business')?'BUSINESS':course.startsWith('Legal')?'LEGAL':'MEDICAL';
+  let chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let rand = ''; for(let i=0;i<6;i++) rand += chars[Math.floor(Math.random()*chars.length)];
+  return prefix + '-' + rand;
+}
+window.copyKey = function(){ navigator.clipboard.writeText(LAST_KEY); alert('Copied: '+LAST_KEY); };
+
+window.createKey = async function(){
+  let name = document.getElementById('studentName').value.trim();
+  let phone = document.getElementById('phone').value.trim().replace(/\s/g,'');
+  let country = document.getElementById('country').value;
+  let course = document.getElementById('course').value;
+  let level = document.getElementById('level').value;
+  let days = parseInt(document.getElementById('duration').value);
+  let payment = document.getElementById('payment').value.trim();
+  if(!name || !phone){ document.getElementById('createMsg').innerHTML='<span style="color:#c62828">❌ Name + Phone required</span>'; return; }
+  let key = genKey(course);
+  let expiresTs = days>=9999 ? 'Lifetime' : Date.now()+days*24*60*60*1000;
+  let expiresDisplay = expiresTs==='Lifetime' ? 'Lifetime' : new Date(expiresTs).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  try{
+    await setDoc(doc(db,'enrolmentKeys', key), { key:key, studentName:name, name:name, phone:phone, country:country, course:course, level:level, expiresAt:expiresTs, expiry:expiresDisplay, durationDays:days, payment:payment, used:false, revoked:false, createdAt:serverTimestamp() });
+    LAST_KEY=key; LAST_NAME=name; LAST_PHONE=phone;
+    document.getElementById('newKeyBox').style.display='block';
+    document.getElementById('newKeyVal').innerText = key;
+    document.getElementById('createMsg').innerHTML='<span style="color:#0d652d">✅ Key created! Expires: '+expiresDisplay+'</span>';
+    let cleanPhone = phone.replace(/\D/g,'');
+    if(cleanPhone.startsWith('0')) cleanPhone='257'+cleanPhone.slice(1);
+    if(!cleanPhone.startsWith('257') && cleanPhone.length<11) cleanPhone='257'+cleanPhone;
+    let waText = 'Hello '+name+' 🎓 Welcome to ISOMERO!%0A%0AYour Key: *'+key+'*%0ACourse: '+course+'%0ALevel: '+level+'%0AExpires: '+expiresDisplay+'%0A%0AGo to: https://isomero.com%0AEnter your Key to start learning.%0A%0AQuestions? WhatsApp +257 62 70 64 04';
+    document.getElementById('waSendBtn').onclick = ()=>{ window.open('https://wa.me/'+cleanPhone+'?text='+waText,'_blank'); };
+    document.getElementById('studentName').value=''; document.getElementById('phone').value=''; document.getElementById('payment').value='';
+    loadUsers();
+  }catch(e){ document.getElementById('createMsg').innerHTML='<span style="color:#c62828">❌ '+esc(e.message)+'</span>'; }
+};
+
+window.revokeKey = async function(key){
+  if(!confirm('Revoke key '+key+' ? Student will be blocked.')) return;
+  await updateDoc(doc(db,'enrolmentKeys',key), { revoked:true });
+  loadUsers();
+};
+window.unrevokeKey = async function(key){
+  await updateDoc(doc(db,'enrolmentKeys',key), { revoked:false });
+  loadUsers();
+};
+window.extendKey = async function(key){
+  let days = prompt('Extend by how many days? (30, 90, 365)', '90');
+  if(!days) return;
+  let d = parseInt(days); if(isNaN(d)) return;
+  let newTs = Date.now()+d*24*60*60*1000;
+  let newExp = new Date(newTs).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  await updateDoc(doc(db,'enrolmentKeys',key), { expiresAt:newTs, expiry:newExp });
+  loadUsers();
+};
+
+window.renderList = function(){
+  let q = (document.getElementById('searchInput').value||'').toLowerCase();
+  let list = ALL.filter(x=> (x.key+' '+x.studentName+' '+x.phone+' '+x.course+' '+x.level).toLowerCase().includes(q));
+  let box = document.getElementById('list');
+  if(!list.length){ box.innerHTML='<p style="text-align:center">No users found.</p>'; return; }
+  let html = '';
+  list.forEach(u=>{
+    let expired = isExpired(u.expiresAt);
+    let clean = String(u.phone||'').replace(/\D/g,'');
+    let waText = 'Hello '+(u.studentName||'')+' 🎓 Your ISOMERO Key: *'+u.key+'* | Course: '+u.course+' | Level: '+u.level+' | Expires: '+formatExp(u.expiresAt);
+    html += `<div class="card"><b>🔑 ${esc(u.key)} - ${esc(u.studentName)}</b> <span class="pill ${u.revoked?'red':expired?'red':'green'}">${u.revoked?'REVOKED':expired?'EXPIRED':'ACTIVE'}</span>
+    <p>📞 ${esc(u.phone)} • 🌍 ${esc(u.country)} • 📚 ${esc(u.course)} - ${esc(u.level)}<br>⏰ Expires: ${formatExp(u.expiresAt)} • 💰 ${esc(u.payment||'-')} • Used: ${u.used?'Yes ✅':'No'}</p>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <a href="https://wa.me/${clean}?text=${encodeURIComponent(waText)}" target="_blank" style="flex:1"><button class="btn-green" style="padding:10px">💬 WhatsApp</button></a>
+      <button class="btn-blue" style="flex:1;padding:10px" onclick="extendKey('${esc(u.key)}')">⏰ + Extend</button>
+      ${u.revoked?`<button class="btn-yellow" style="flex:1;padding:10px" onclick="unrevokeKey('${esc(u.key)}')">✅ Unblock</button>`:`<button class="btn-red" style="flex:1;padding:10px" onclick="revokeKey('${esc(u.key)}')">🚫 Revoke</button>`}
+    </div></div>`;
+  });
+  box.innerHTML = html;
+};
+async function loadUsers(){
+  try{
+    let snap = await getDocs(query(collection(db,'enrolmentKeys'), orderBy('createdAt','desc'), limit(200)));
+    ALL=[]; snap.forEach(d=>ALL.push(d.data()));
+    renderList();
+  }catch(e){ document.getElementById('list').innerHTML='<p style="text-align:center">❌ '+esc(e.message)+'</p>'; }
+}
+</script>
+</body>
+</html>
