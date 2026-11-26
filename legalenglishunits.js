@@ -1,11 +1,11 @@
 // ============================================
 // ISOMERO - EAC Curriculum
-// lunits.js - THE BRAIN - LUNIT1 to LUNIT104 - EAC VERSION - CORRIGÉ
-// FIX: window.ISOMERO_LUNITS_DATA à la fin + 1 seul B1.2 (pas 2)
+// legalenglishunits.js - THE BRAIN - LUNIT1 to LUNIT104 - EAC VERSION - CORRIGÉ
+// FIX: window.ISOMERO_LEGALENGLISHUNITS_DATA à la fin + 1 seul B1.2 (pas 2)
 // Mary = Female - Pitch 1.35 - Arusha
 // John = Male - Pitch 0.65 - Nairobi
 // ============================================
-const ISOMERO_LUNITS_DATA = {
+const ISOMERO_LEGALENGLISHUNITS_DATA = {
   "app": "Isomero - East African Community English Curriculum - Legal English - LUNIT",
   "characters": ["Mary", "John"],
   "characterBible": {
@@ -207,6 +207,6 @@ const ISOMERO_LUNITS_DATA = {
 };
 
 // ✅ FIX CRITIQUE - Sans ces 3 lignes, unit.html ne voit RIEN
-window.ISOMERO_LUNITS_DATA = ISOMERO_LUNITS_DATA;
-window.ISOMERO_DATA_LUNIT = ISOMERO_LUNITS_DATA;
-window.ISOMERO_LEGAL_DATA = ISOMERO_LUNITS_DATA;
+window.ISOMERO_LUNITS_DATA = ISOMERO_LEGALENGLISHUNITS_DATA;
+window.ISOMERO_DATA_LUNIT = ISOMERO_LEGALENGLISHUNIT_DATA;
+window.ISOMERO_LEGALENGLISH_DATA = ISOMERO_LEGALENGLISHUNITS_DATA;
