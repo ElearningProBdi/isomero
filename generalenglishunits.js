@@ -1,6 +1,6 @@
 // ============================================
 // ISOMERO - EAC Curriculum
-// gunits.js - THE BRAIN - GUNIT1 to GUNIT104 - EAC VERSION - CORRIGÉ
+// generalenglishunits.js - THE BRAIN - GUNIT1 to GUNIT104 - EAC VERSION - CORRIGÉ
 // FIX: window.ISOMERO_DATA à la fin, sinon unit.html ne voit RIEN
 // Mary = Female - Pitch 1.35 - Arusha
 // John = Male - Pitch 0.65 - Nairobi
@@ -208,4 +208,4 @@ const ISOMERO_DATA = {
 
 // ✅ FIX CRITIQUE - Sans ces 2 lignes, unit.html ne voit RIEN
 window.ISOMERO_DATA = ISOMERO_DATA;
-window.ISOMERO_GUNITS_DATA = ISOMERO_DATA;
+window.ISOMERO_GENERALENGLISHUNITS_DATA = ISOMERO_DATA;
