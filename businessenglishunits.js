@@ -1,6 +1,6 @@
 // ============================================
 // ISOMERO - EAC Curriculum
-// bunits.js - THE BRAIN - BUNIT1 to BUNIT104 - EAC VERSION - CORRIGÉ
+// businessenglishunits.js - THE BRAIN - BUNIT1 to BUNIT104 - EAC VERSION - CORRIGÉ
 // FIX: window.ISOMERO_BUNITS_DATA à la fin + 1 seul B1.2 (pas 2)
 // Mary = Female - Pitch 1.35 - Arusha
 // John = Male - Pitch 0.65 - Nairobi
