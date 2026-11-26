@@ -5,7 +5,7 @@
 // Mary = Female - Pitch 1.35 - Arusha
 // John = Male - Pitch 0.65 - Nairobi
 // ============================================
-const ISOMERO_BUNITS_DATA = {
+const ISOMERO_BUSINESSENGLISHUNITS_DATA = {
   "app": "Isomero - East African Community English Curriculum - Business English - BUNIT",
   "characters": ["Mary", "John"],
   "characterBible": {
@@ -207,6 +207,6 @@ const ISOMERO_BUNITS_DATA = {
 };
 
 // ✅ FIX CRITIQUE - Sans ces 3 lignes, unit.html ne voit RIEN
-window.ISOMERO_BUNITS_DATA = ISOMERO_BUNITS_DATA;
-window.ISOMERO_DATA_BUNIT = ISOMERO_BUNITS_DATA;
-window.ISOMERO_BUSINESS_DATA = ISOMERO_BUNITS_DATA;
+window.ISOMERO_BUNITS_DATA = ISOMERO_BUSINESSENGLISHUNITS_DATA;
+window.ISOMERO_DATA_BUNIT = ISOMERO_BUSINESSENGLISHUNITS_DATA;
+window.ISOMERO_BUSINESS_DATA = ISOMERO_BUSINESSENGLISHUNITS_DATA;
